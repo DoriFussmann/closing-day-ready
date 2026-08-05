@@ -1,0 +1,26 @@
+---
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  faqs: Faq[];
+}
+
+const { faqs } = Astro.props;
+---
+
+<section aria-labelledby="faq-heading" class="mt-12 border-t border-border pt-10">
+  <h2 id="faq-heading" class="mb-6 text-h3">Frequently asked questions</h2>
+  <div class="space-y-4">
+    {
+      faqs.map((faq) => (
+        <section class="rounded-card border border-border bg-white p-5 md:p-6">
+          <h3 class="mb-3 text-h4 text-heading">{faq.question}</h3>
+          <p class="m-0 text-content text-body">{faq.answer}</p>
+        </section>
+      ))
+    }
+  </div>
+</section>

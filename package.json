@@ -1,0 +1,13 @@
+{
+  "name": "closing-day-ready",
+  "private": true,
+  "workspaces": [
+    "site",
+    "cms"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=site",
+    "build": "npm run build --workspace=site",
+    "cms": "npm run start --workspace=cms"
+  }
+}

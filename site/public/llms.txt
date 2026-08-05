@@ -1,0 +1,7 @@
+# Site Name
+
+> Site Name publishes structured articles optimized for search and answer engines.
+
+## Articles
+
+- [How Technical SEO Supports Answer Engine Visibility Online](https://example.com/articles/technical-seo-answer-engine-visibility/): Clean HTML, structured data, clear authorship, and honest internal links help articles stay discoverable in classic search results and AI answer engines.

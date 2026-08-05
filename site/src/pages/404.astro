@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../config/site";
+---
+
+<BaseLayout
+  title={`Page not found — ${SITE_NAME}`}
+  description={`The page you requested could not be found on ${SITE_NAME}. Return home or browse articles.`}
+  canonicalPath="/404/"
+  robots="noindex, follow"
+>
+  <section aria-labelledby="not-found-heading" class="section-space">
+    <div class="container-site mx-auto max-w-article text-center">
+      <h1 id="not-found-heading" class="mb-4">Page not found</h1>
+      <p class="mb-8 text-body text-muted">The page you requested does not exist.</p>
+      <nav aria-label="Recovery links">
+        <ul class="m-0 flex list-none flex-wrap items-center justify-center gap-3 p-0">
+          <li>
+            <a href="/" class="btn-primary">Home</a>
+          </li>
+          <li>
+            <a href="/articles/" class="btn-secondary">Articles</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+</BaseLayout>

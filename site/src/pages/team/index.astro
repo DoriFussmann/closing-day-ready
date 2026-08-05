@@ -1,0 +1,64 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../../config/site";
+
+const team = await getCollection("team");
+---
+
+<BaseLayout
+  title={`Team — ${SITE_NAME}`}
+  description={`Meet the ${SITE_NAME} team. Bios, roles, credentials, and professional profiles for every contributor.`}
+  canonicalPath="/team/"
+>
+  <section aria-labelledby="team-heading" class="section-space">
+    <div class="container-site">
+      <h1 id="team-heading" class="mb-10">Team</h1>
+      <ul class="m-0 grid list-none gap-6 p-0 md:grid-cols-2">
+        {
+          team.map((member) => (
+            <li id={member.data.slug}>
+              <article class="card h-full">
+                <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
+                  <Image
+                    src={member.data.photo}
+                    alt={`Photo of ${member.data.name}`}
+                    width={240}
+                    height={240}
+                    loading="lazy"
+                    class="h-24 w-24 shrink-0 rounded-full object-cover sm:h-28 sm:w-28"
+                  />
+                  <div class="min-w-0 flex-1">
+                    <h2 class="mb-1 text-h3">{member.data.name}</h2>
+                    <p class="m-0 text-small font-normal text-accent">{member.data.role}</p>
+                    {member.data.credentials && (
+                      <p class="mt-2 text-small text-muted">{member.data.credentials}</p>
+                    )}
+                  </div>
+                </div>
+                <p class="mt-5 mb-0 text-content text-body">{member.data.bio}</p>
+                {member.data.sameAs && member.data.sameAs.length > 0 && (
+                  <ul class="mt-5 list-none space-y-2 p-0">
+                    {member.data.sameAs.map((url) => (
+                      <li>
+                        <a
+                          href={url}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          class="break-all text-small text-accent"
+                        >
+                          {url}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

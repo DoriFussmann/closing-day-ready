@@ -1,0 +1,213 @@
+---
+import { Image, getImage } from "astro:assets";
+import { getEntry, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import AuthorBio from "../components/AuthorBio.astro";
+import RelatedLinks from "../components/RelatedLinks.astro";
+import Sources from "../components/Sources.astro";
+import FaqBlock from "../components/FaqBlock.astro";
+import { SITE_NAME, SITE_URL } from "../config/site";
+import { absoluteUrl } from "../lib/url";
+
+interface Props {
+  article: CollectionEntry<"articles">;
+}
+
+const { article } = Astro.props;
+const data = article.data;
+
+const authorEntry = await getEntry("team", data.author);
+if (!authorEntry) {
+  throw new Error(
+    `Article "${data.slug}" references unknown author team slug "${data.author}". Add the team member or fix the author field.`
+  );
+}
+
+const { Content } = await render(article);
+const pageH1 = data.h1 || data.title;
+const updatedDate = data.updatedDate || data.date;
+const ogTitle = data.ogTitle || data.title;
+const ogDescription = data.ogDescription || data.description;
+
+const heroForOg = data.image;
+const optimizedHero = await getImage({ src: heroForOg, format: "jpg" });
+const defaultOgSrc = /^https?:\/\//i.test(optimizedHero.src)
+  ? optimizedHero.src
+  : new URL(optimizedHero.src, SITE_URL).href;
+const ogImageResolved = data.ogImage
+  ? /^https?:\/\//i.test(data.ogImage)
+    ? data.ogImage
+    : absoluteUrl(data.ogImage)
+  : defaultOgSrc;
+
+const articlePath = `/articles/${data.slug}/`;
+const articleUrl = absoluteUrl(articlePath);
+
+const breadcrumbItems = [
+  { name: "Home", url: absoluteUrl("/") },
+  { name: "Articles", url: absoluteUrl("/articles/") },
+  { name: data.title, url: articleUrl },
+];
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: breadcrumbItems.map((item, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: item.name,
+    item: item.url,
+  })),
+};
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: authorEntry.data.name,
+  jobTitle: authorEntry.data.role,
+  description: authorEntry.data.bio,
+  url: absoluteUrl(`/team/#${authorEntry.data.slug}`),
+  sameAs: authorEntry.data.sameAs || [],
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": data.schemaType || "BlogPosting",
+  headline: data.title,
+  description: data.description,
+  datePublished: data.date.toISOString(),
+  dateModified: updatedDate.toISOString(),
+  author: {
+    "@type": "Person",
+    name: authorEntry.data.name,
+    url: absoluteUrl(`/team/#${authorEntry.data.slug}`),
+  },
+  image: defaultOgSrc,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": articleUrl,
+  },
+  publisher: {
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: absoluteUrl("/"),
+  },
+};
+
+const faqLd =
+  data.faqs && data.faqs.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: data.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      }
+    : null;
+
+const jsonLd = [articleLd, personLd, breadcrumbLd, faqLd].filter(Boolean) as Record<
+  string,
+  unknown
+>[];
+
+const publishedLabel = data.date.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+const updatedLabel = updatedDate.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  canonicalPath={articlePath}
+  canonical={data.canonical}
+  robots={data.robots}
+  locale={data.locale}
+  ogType="article"
+  ogTitle={ogTitle}
+  ogDescription={ogDescription}
+  ogImage={ogImageResolved}
+  twitterCard={data.twitterCard}
+  jsonLd={jsonLd}
+>
+  <article class="container-site section-space mx-auto max-w-article">
+    <Breadcrumbs items={breadcrumbItems} />
+    <header class="mb-10">
+      <h1 class="mb-4">{pageH1}</h1>
+      <p class="mb-2 text-small text-muted">
+        Published on {publishedLabel} · Updated on {updatedLabel}
+      </p>
+      <p class="mb-8 text-small text-muted">
+        <span class="font-normal text-heading">{data.category}</span>
+        {
+          data.tags.map((tag) => (
+            <span> · {tag}</span>
+          ))
+        }
+      </p>
+      <Image
+        src={data.image}
+        alt={data.imageAlt}
+        width={1200}
+        height={630}
+        loading="eager"
+        class="h-auto w-full rounded-card border border-border"
+      />
+    </header>
+
+    <div class="prose-article">
+      <Content />
+    </div>
+
+    {
+      data.image2 && data.image2Alt && (
+        <figure class="mt-10">
+          <Image
+            src={data.image2}
+            alt={data.image2Alt}
+            width={1200}
+            height={630}
+            loading="lazy"
+            class="h-auto w-full rounded-card border border-border"
+          />
+        </figure>
+      )
+    }
+    {
+      data.image3 && data.image3Alt && (
+        <figure class="mt-10">
+          <Image
+            src={data.image3}
+            alt={data.image3Alt}
+            width={1200}
+            height={630}
+            loading="lazy"
+            class="h-auto w-full rounded-card border border-border"
+          />
+        </figure>
+      )
+    }
+
+    <AuthorBio author={authorEntry} />
+    {data.internalLinks && data.internalLinks.length > 0 && (
+      <RelatedLinks links={data.internalLinks} />
+    )}
+    {data.externalLinks && data.externalLinks.length > 0 && (
+      <Sources links={data.externalLinks} />
+    )}
+    {data.faqs && data.faqs.length > 0 && <FaqBlock faqs={data.faqs} />}
+  </article>
+</BaseLayout>

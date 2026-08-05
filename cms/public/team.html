@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMS — Team</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Articles</a>
+        |
+        <a href="/team.html">Team</a>
+        |
+        <a href="/dashboard.html">Dashboard</a>
+      </nav>
+      <h1>New / Edit Team Member</h1>
+    </header>
+
+    <main>
+      <section aria-labelledby="team-list-heading">
+        <h2 id="team-list-heading">Existing team</h2>
+        <ul id="team-list"></ul>
+      </section>
+
+      <section aria-labelledby="team-form-heading">
+        <h2 id="team-form-heading">Team member form</h2>
+        <form id="team-form">
+          <p>
+            <label>name <input name="name" required /></label>
+          </p>
+          <p>
+            <label>slug <input name="slug" required /></label>
+          </p>
+          <p>
+            <label>role <input name="role" required /></label>
+          </p>
+          <p>
+            <label>bio <textarea name="bio" rows="5" required></textarea></label>
+          </p>
+          <p>
+            <label>credentials (optional) <input name="credentials" /></label>
+          </p>
+          <p>
+            <label
+              >photo (required for new; max 10MB)
+              <input name="photo" type="file" accept="image/*" />
+            </label>
+          </p>
+          <p>
+            <label
+              >sameAs (one URL per line)
+              <textarea name="sameAs" rows="3"></textarea>
+            </label>
+          </p>
+          <p>
+            <label>
+              <input type="checkbox" id="team-overwrite" />
+              Overwrite existing slug
+            </label>
+          </p>
+          <p>
+            <button type="submit">Save team member</button>
+            <button type="button" id="team-reset">Reset form</button>
+          </p>
+          <pre id="team-status" aria-live="polite"></pre>
+        </form>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

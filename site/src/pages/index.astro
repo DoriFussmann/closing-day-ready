@@ -1,0 +1,97 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../config/site";
+
+const services = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const articles = (await getCollection("articles"))
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+---
+
+<BaseLayout
+  title={`${SITE_NAME} — Home`}
+  description={`${SITE_NAME} publishes practical guides and service overviews. Browse latest articles and learn what we offer.`}
+  canonicalPath="/"
+>
+  {/* Hero — §10 hero copy unset; keep infra chrome text, restyle as hero */}
+  <section aria-labelledby="home-intro" class="border-b border-border bg-surface">
+    <div class="container-site section-space">
+      <div class="mx-auto max-w-article">
+        <h1 id="home-intro" class="mb-5">{SITE_NAME}</h1>
+        <p class="mb-8 max-w-2xl text-content text-body">
+          Welcome to {SITE_NAME}. This template site publishes clear, structured articles
+          designed for search engines and answer engines. Replace this intro when you
+          deploy a real project.
+        </p>
+        <a href="/articles/" class="btn-primary">Browse articles</a>
+      </div>
+    </div>
+  </section>
+
+  {/* Latest Guides — ordered ahead of Buying Journey per §10 homepageSections */}
+  <section aria-labelledby="latest-articles-heading" class="section-space">
+    <div class="container-site">
+      <h2 id="latest-articles-heading" class="mb-8">Latest Articles</h2>
+      <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          articles.map((article) => (
+            <li>
+              <a
+                href={`/articles/${article.data.slug}/`}
+                class="card group flex h-full flex-col no-underline transition-colors hover:border-accent/40 hover:no-underline"
+              >
+                <span class="mb-3 block text-h4 font-light text-heading group-hover:text-accent">
+                  {article.data.title}
+                </span>
+                <p class="m-0 flex-1 text-small text-muted">{article.data.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-8">
+        <a href="/articles/" class="btn-secondary">View all articles</a>
+      </p>
+    </div>
+  </section>
+
+  {/* Buying Journey — services scroll section from infra build */}
+  <section aria-labelledby="services-heading" class="border-t border-border bg-surface section-space">
+    <div class="container-site">
+      <h2 id="services-heading" class="mb-8">Services</h2>
+      <ul class="m-0 flex list-none gap-4 overflow-x-auto p-0 pb-2 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
+        {
+          services.map((service) => (
+            <li class="min-w-[min(100%,20rem)] shrink-0 snap-start md:min-w-0">
+              <div class="card h-full">
+                <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-btn border border-border bg-background text-accent">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5z"></path>
+                  </svg>
+                </div>
+                <h3 class="mb-3 text-h4">{service.data.title}</h3>
+                <p class="m-0 text-small text-muted">{service.data.summary}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

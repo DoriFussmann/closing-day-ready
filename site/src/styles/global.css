@@ -1,0 +1,100 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@config "../../tailwind.config.mjs";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background font-sans text-content font-light text-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-light text-heading;
+  }
+
+  h1 {
+    @apply text-h1 md:text-h1-lg;
+  }
+
+  h2 {
+    @apply text-h2;
+  }
+
+  h3 {
+    @apply text-h3;
+  }
+
+  h4 {
+    @apply text-h4;
+  }
+
+  p {
+    @apply text-content leading-[1.7];
+  }
+
+  a {
+    @apply text-accent underline-offset-2 transition-colors;
+  }
+
+  a:hover {
+    @apply underline;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  ::selection {
+    @apply bg-accent/15 text-heading;
+  }
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn bg-accent px-5 py-2.5 text-small font-normal text-white no-underline transition-colors hover:bg-[#1D4ED8] hover:no-underline;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-border bg-white px-5 py-2.5 text-small font-normal text-heading no-underline transition-colors hover:bg-surface hover:no-underline;
+  }
+
+  .card {
+    @apply rounded-card border border-border bg-white p-6 shadow-card;
+  }
+
+  .prose-article {
+    @apply prose prose-lg max-w-none font-light text-body
+      prose-headings:font-light prose-headings:text-heading
+      prose-h2:text-h2 prose-h3:text-h3 prose-h4:text-h4
+      prose-p:text-content prose-p:leading-[1.7] prose-p:text-body
+      prose-a:font-normal prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+      prose-strong:font-semibold prose-strong:text-heading
+      prose-li:marker:text-muted
+      prose-hr:border-border
+      prose-blockquote:border-accent/30 prose-blockquote:text-muted
+      prose-code:font-normal prose-code:text-heading
+      prose-img:rounded-card;
+  }
+
+  .section-space {
+    @apply py-12 md:py-16;
+  }
+
+  .tap-target {
+    @apply inline-flex min-h-11 min-w-11 items-center;
+  }
+}

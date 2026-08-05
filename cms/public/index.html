@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMS — New / Edit Article</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Articles</a>
+        |
+        <a href="/team.html">Team</a>
+        |
+        <a href="/dashboard.html">Dashboard</a>
+      </nav>
+      <h1>New / Edit Article</h1>
+    </header>
+
+    <main>
+      <section aria-labelledby="existing-list">
+        <h2 id="existing-list">Existing articles</h2>
+        <ul id="article-list"></ul>
+      </section>
+
+      <section aria-labelledby="md-drop-heading">
+        <h2 id="md-drop-heading">Markdown file</h2>
+        <p id="md-drop" tabindex="0">Drop a .md file here</p>
+        <p id="md-drop-status"></p>
+      </section>
+
+      <section aria-labelledby="missing-heading">
+        <h2 id="missing-heading">Missing Fields</h2>
+        <p id="missing-summary">Drop a markdown file to begin.</p>
+      </section>
+
+      <section aria-labelledby="checklist-heading">
+        <h2 id="checklist-heading">Field checklist</h2>
+        <form id="article-form">
+          <fieldset>
+            <legend>Core</legend>
+            <p data-field="title">
+              <label>title <span class="status"></span></label>
+              <input name="title" maxlength="60" />
+              <span class="counter" data-for="title"></span>
+            </p>
+            <p data-field="description">
+              <label>description <span class="status"></span></label>
+              <textarea name="description" maxlength="160" rows="3"></textarea>
+              <span class="counter" data-for="description"></span>
+            </p>
+            <p data-field="slug">
+              <label>slug <span class="status"></span></label>
+              <input name="slug" />
+            </p>
+            <p data-field="date">
+              <label>date <span class="status"></span></label>
+              <input name="date" type="date" />
+            </p>
+            <p data-field="updatedDate">
+              <label>updatedDate (optional override)</label>
+              <input name="updatedDate" type="date" />
+            </p>
+            <p data-field="author">
+              <label>author <span class="status"></span></label>
+              <select name="author"></select>
+            </p>
+            <p data-field="category">
+              <label>category <span class="status"></span></label>
+              <input name="category" />
+            </p>
+            <p data-field="tags">
+              <label>tags (comma-separated, 4–6) <span class="status"></span></label>
+              <input name="tags" />
+            </p>
+            <p data-field="keywords">
+              <label>keywords (comma-separated, optional)</label>
+              <input name="keywords" />
+            </p>
+            <p data-field="h1">
+              <label>h1 (optional)</label>
+              <input name="h1" />
+              <small>Optional — leave as-is to match the page title, or write a distinct H1 for the reader.</small>
+            </p>
+            <p data-field="draft">
+              <label><input name="draft" type="checkbox" /> draft</label>
+            </p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Images (max 10MB per file)</legend>
+            <p>Drop up to 3 images below. First = hero. Alt text minimum 10 characters.</p>
+            <p id="image-drop" tabindex="0">Drop images here (up to 3)</p>
+            <p id="image-drop-status"></p>
+            <p data-field="image">
+              <label>image (hero) <span class="status"></span></label>
+              <span id="image-file-label">No file this session</span>
+            </p>
+            <p data-field="imageAlt">
+              <label>imageAlt <span class="status"></span></label>
+              <input name="imageAlt" />
+            </p>
+            <p data-field="image2">
+              <label>image2 <span class="status"></span></label>
+              <span id="image2-file-label">No file this session</span>
+            </p>
+            <p data-field="image2Alt">
+              <label>image2Alt</label>
+              <input name="image2Alt" />
+            </p>
+            <p data-field="image3">
+              <label>image3 <span class="status"></span></label>
+              <span id="image3-file-label">No file this session</span>
+            </p>
+            <p data-field="image3Alt">
+              <label>image3Alt</label>
+              <input name="image3Alt" />
+            </p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Optional SEO overrides (saved only if different from base)</legend>
+            <p>
+              <label>ogTitle</label>
+              <input name="ogTitle" />
+            </p>
+            <p>
+              <label>ogDescription</label>
+              <textarea name="ogDescription" rows="2"></textarea>
+            </p>
+            <p>
+              <label>ogImage (path or URL)</label>
+              <input name="ogImage" />
+            </p>
+            <p>
+              <label>canonical</label>
+              <input name="canonical" />
+            </p>
+            <p>
+              <label>robots</label>
+              <input name="robots" value="index, follow" />
+            </p>
+            <p>
+              <label>schemaType</label>
+              <input name="schemaType" value="BlogPosting" />
+            </p>
+            <p>
+              <label>locale</label>
+              <input name="locale" value="en-US" />
+            </p>
+            <p>
+              <label>twitterCard</label>
+              <input name="twitterCard" value="summary_large_image" />
+            </p>
+          </fieldset>
+
+          <fieldset>
+            <legend>internalLinks</legend>
+            <div id="internal-links"></div>
+            <button type="button" id="add-internal">Add internal link</button>
+            <p id="internal-warnings"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>externalLinks</legend>
+            <div id="external-links"></div>
+            <button type="button" id="add-external">Add external link</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>faqs (optional)</legend>
+            <div id="faqs"></div>
+            <button type="button" id="add-faq">Add FAQ</button>
+          </fieldset>
+
+          <fieldset>
+            <legend>Body</legend>
+            <textarea name="body" rows="12"></textarea>
+          </fieldset>
+
+          <p id="slug-collision"></p>
+          <p id="generate-reason"></p>
+          <p>
+            <button type="button" id="preview-jsonld">Preview JSON-LD</button>
+            <button type="button" id="generate" disabled>Generate</button>
+            <label>
+              <input type="checkbox" id="overwrite" />
+              Overwrite existing slug
+            </label>
+          </p>
+          <pre id="action-status" aria-live="polite"></pre>
+          <pre id="jsonld-preview"></pre>
+        </form>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

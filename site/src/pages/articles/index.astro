@@ -1,0 +1,89 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../../config/site";
+
+const allArticles = (await getCollection("articles"))
+  .filter((a) => !a.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const pageSize = 9;
+const currentPage = 1;
+const totalPages = Math.max(1, Math.ceil(allArticles.length / pageSize));
+const articles = allArticles.slice(0, pageSize);
+---
+
+<BaseLayout
+  title={`Articles — ${SITE_NAME}`}
+  description={`Browse all published articles from ${SITE_NAME}. Practical guides with clear authorship, sources, and structured data.`}
+  canonicalPath="/articles/"
+>
+  <section aria-labelledby="articles-heading" class="section-space">
+    <div class="container-site">
+      <h1 id="articles-heading" class="mb-8">Articles</h1>
+      <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          articles.map((article) => (
+            <li>
+              <a
+                href={`/articles/${article.data.slug}/`}
+                class="card group flex h-full flex-col no-underline transition-colors hover:border-accent/40 hover:no-underline"
+              >
+                <span class="mb-3 block text-h4 font-light text-heading group-hover:text-accent">
+                  {article.data.title}
+                </span>
+                <p class="m-0 flex-1 text-small text-muted">{article.data.description}</p>
+                <p class="mt-4 mb-0 text-small text-muted">
+                  <time datetime={article.data.date.toISOString()}>
+                    {article.data.date.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        totalPages > 1 && (
+          <nav aria-label="Pagination" class="mt-10 border-t border-border pt-8">
+            <p class="mb-4 text-small text-muted">
+              Page {currentPage} of {totalPages}
+            </p>
+            <ol class="m-0 flex list-none flex-wrap gap-2 p-0">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <li>
+                  {n === currentPage ? (
+                    <span
+                      aria-current="page"
+                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn bg-accent px-3 text-small font-normal text-white"
+                    >
+                      {n}
+                    </span>
+                  ) : n === 1 ? (
+                    <a
+                      href="/articles/"
+                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-border bg-white px-3 text-small text-heading no-underline hover:bg-surface hover:no-underline"
+                    >
+                      {n}
+                    </a>
+                  ) : (
+                    <a
+                      href={`/articles/page/${n}/`}
+                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-border bg-white px-3 text-small text-heading no-underline hover:bg-surface hover:no-underline"
+                    >
+                      {n}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

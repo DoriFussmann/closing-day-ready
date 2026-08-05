@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CMS — Dashboard</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Articles</a>
+        |
+        <a href="/team.html">Team</a>
+        |
+        <a href="/dashboard.html">Dashboard</a>
+      </nav>
+      <h1>Dashboard</h1>
+    </header>
+
+    <main>
+      <section aria-labelledby="health-heading">
+        <h2 id="health-heading">Article health</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>title</th>
+              <th>slug</th>
+              <th>draft</th>
+              <th>internalLinks</th>
+              <th>externalLinks</th>
+              <th>faqs</th>
+              <th>updatedDate</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-body"></tbody>
+        </table>
+        <pre id="dashboard-status" aria-live="polite"></pre>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
