@@ -57,6 +57,7 @@ const team = defineCollection({
       credentials: z.string().optional(),
       photo: image(),
       sameAs: z.array(z.string().url()).default([]),
+      draft: z.boolean().default(false),
     }),
 });
 

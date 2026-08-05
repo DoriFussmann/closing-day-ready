@@ -1,7 +1,7 @@
-# Site Name
+# Closing Day Ready
 
-> Site Name publishes structured articles optimized for search and answer engines.
+> Closing Day Ready provides comprehensive educational content for people buying a home. From understanding mortgages and improving credit to making offers, negotiating contracts, completing inspections, and preparing for closing day, the platform delivers practical resources that help buyers make informed decisions while avoiding costly mistakes.
 
 ## Articles
 
-- [How Technical SEO Supports Answer Engine Visibility Online](https://example.com/articles/technical-seo-answer-engine-visibility/): Clean HTML, structured data, clear authorship, and honest internal links help articles stay discoverable in classic search results and AI answer engines.
+- No published articles yet.

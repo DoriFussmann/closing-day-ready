@@ -6,4 +6,5 @@ bio: Alex Rivera writes research-backed guides on technical SEO and answer-engin
 credentials: M.S. Information Science
 photo: ../../assets/team/alex-rivera/photo.png
 sameAs: []
+draft: true
 ---

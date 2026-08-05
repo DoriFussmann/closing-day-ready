@@ -15,18 +15,17 @@ const articles = (await getCollection("articles"))
 
 <BaseLayout
   title={`${SITE_NAME} — Home`}
-  description={`${SITE_NAME} publishes practical guides and service overviews. Browse latest articles and learn what we offer.`}
+  description="Closing Day Ready is a trusted resource that helps homebuyers navigate every step of the buying process with clear, practical, and unbiased guidance."
   canonicalPath="/"
 >
-  {/* Hero — §10 hero copy unset; keep infra chrome text, restyle as hero */}
+  {/* Hero */}
   <section aria-labelledby="home-intro" class="border-b border-border bg-surface">
     <div class="container-site section-space">
       <div class="mx-auto max-w-article">
         <h1 id="home-intro" class="mb-5">{SITE_NAME}</h1>
         <p class="mb-8 max-w-2xl text-content text-body">
-          Welcome to {SITE_NAME}. This site publishes clear, structured articles
-          designed for search engines and answer engines. Replace this intro when you
-          deploy a real project.
+          Closing Day Ready is a trusted resource that helps homebuyers navigate every
+          step of the buying process with clear, practical, and unbiased guidance.
         </p>
         <a href="/articles/" class="btn-primary">Browse articles</a>
       </div>

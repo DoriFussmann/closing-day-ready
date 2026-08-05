@@ -47,7 +47,7 @@ export function generateLlmsTxt(): string {
   const lines = [
     `# ${SITE_NAME}`,
     "",
-    `> ${SITE_NAME} publishes structured articles optimized for search and answer engines.`,
+    "> Closing Day Ready provides comprehensive educational content for people buying a home. From understanding mortgages and improving credit to making offers, negotiating contracts, completing inspections, and preparing for closing day, the platform delivers practical resources that help buyers make informed decisions while avoiding costly mistakes.",
     "",
     "## Articles",
     "",
