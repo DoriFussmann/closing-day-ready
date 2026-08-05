@@ -121,13 +121,17 @@ function updateCounters(form) {
   const dCounter = form.querySelector('.counter[data-for="description"]');
   if (title && tCounter) {
     const n = title.value.length;
+    const ok = n >= 55 && n <= 60;
     tCounter.textContent = `${n}/55–60`;
-    tCounter.style.color = n >= 55 && n <= 60 ? "green" : "red";
+    tCounter.classList.toggle("is-ok", ok);
+    tCounter.classList.toggle("is-bad", !ok);
   }
   if (desc && dCounter) {
     const n = desc.value.length;
+    const ok = n >= 140 && n <= 160;
     dCounter.textContent = `${n}/140–160`;
-    dCounter.style.color = n >= 140 && n <= 160 ? "green" : "red";
+    dCounter.classList.toggle("is-ok", ok);
+    dCounter.classList.toggle("is-bad", !ok);
   }
 }
 
@@ -137,7 +141,7 @@ function addLinkRow(container, prefix, values = { label: "", url: "" }) {
   row.innerHTML = `
     <input name="${prefix}-label" placeholder="label" value="${escapeAttr(values.label)}" />
     <input name="${prefix}-url" placeholder="url" value="${escapeAttr(values.url)}" />
-    <button type="button" class="remove-row">Remove</button>
+    <button type="button" class="remove-row btn-secondary">Remove</button>
   `;
   row.querySelector(".remove-row").addEventListener("click", () => {
     row.remove();
@@ -152,7 +156,7 @@ function addFaqRow(container, values = { question: "", answer: "" }) {
   row.innerHTML = `
     <input name="faq-q" placeholder="question" value="${escapeAttr(values.question)}" />
     <textarea name="faq-a" placeholder="answer" rows="2">${escapeHtml(values.answer)}</textarea>
-    <button type="button" class="remove-row">Remove</button>
+    <button type="button" class="remove-row btn-secondary">Remove</button>
   `;
   row.querySelector(".remove-row").addEventListener("click", () => {
     row.remove();
@@ -257,11 +261,13 @@ async function loadArticleList() {
     const li = document.createElement("li");
     li.innerHTML = `
       <a href="#" data-slug="${escapeAttr(a.slug)}">${escapeHtml(a.title)}</a>
-      ${a.draft ? "(draft)" : ""}
-      <button type="button" data-action="toggle-draft" data-slug="${escapeAttr(a.slug)}" data-draft="${a.draft ? "false" : "true"}">
-        ${a.draft ? "Publish" : "Unpublish"}
-      </button>
-      <button type="button" data-action="delete" data-slug="${escapeAttr(a.slug)}">Delete</button>
+      ${a.draft ? '<span class="badge">draft</span>' : ""}
+      <span class="item-actions">
+        <button type="button" class="list-action" data-action="toggle-draft" data-slug="${escapeAttr(a.slug)}" data-draft="${a.draft ? "false" : "true"}">
+          ${a.draft ? "Publish" : "Unpublish"}
+        </button>
+        <button type="button" class="btn-danger" data-action="delete" data-slug="${escapeAttr(a.slug)}">Delete</button>
+      </span>
     `;
     list.appendChild(li);
   }
@@ -409,10 +415,13 @@ function applyChecklistStatuses(statuses) {
     const st = byField[field];
     if (!st) {
       statusEl.textContent = "";
+      statusEl.classList.remove("is-ok", "is-bad");
       continue;
     }
     statusEl.textContent = st.ok ? "✓" : "✗";
     statusEl.title = st.message || "";
+    statusEl.classList.toggle("is-ok", st.ok);
+    statusEl.classList.toggle("is-bad", !st.ok);
   }
 }
 
@@ -633,8 +642,10 @@ async function initTeamPage() {
       const li = document.createElement("li");
       li.innerHTML = `
         <a href="#" data-slug="${escapeAttr(m.slug)}">${escapeHtml(m.name)}</a>
-        — ${escapeHtml(m.role)}
-        <button type="button" data-action="delete" data-slug="${escapeAttr(m.slug)}">Delete</button>
+        <span class="item-meta">${escapeHtml(m.role)}</span>
+        <span class="item-actions">
+          <button type="button" class="btn-danger" data-action="delete" data-slug="${escapeAttr(m.slug)}">Delete</button>
+        </span>
       `;
       list.appendChild(li);
     }

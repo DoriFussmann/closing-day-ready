@@ -3,37 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CMS — Dashboard</title>
+    <title>Dashboard — Closing Day Ready CMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/cms.css" />
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/">Articles</a>
-        |
-        <a href="/team.html">Team</a>
-        |
-        <a href="/dashboard.html">Dashboard</a>
-      </nav>
-      <h1>Dashboard</h1>
+    <header class="site-header">
+      <div class="container site-nav">
+        <a class="brand" href="/">Closing Day Ready CMS</a>
+        <ul class="nav-links">
+          <li><a href="/">Articles</a></li>
+          <li><a href="/team.html">Team</a></li>
+          <li><a href="/dashboard.html" aria-current="page">Dashboard</a></li>
+        </ul>
+      </div>
     </header>
 
-    <main>
-      <section aria-labelledby="health-heading">
+    <div class="page-hero">
+      <div class="container">
+        <h1>Dashboard</h1>
+        <p>Review article health across drafts, links, FAQs, and update dates.</p>
+      </div>
+    </div>
+
+    <main class="container">
+      <section class="panel" aria-labelledby="health-heading">
         <h2 id="health-heading">Article health</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>title</th>
-              <th>slug</th>
-              <th>draft</th>
-              <th>internalLinks</th>
-              <th>externalLinks</th>
-              <th>faqs</th>
-              <th>updatedDate</th>
-            </tr>
-          </thead>
-          <tbody id="dashboard-body"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>title</th>
+                <th>slug</th>
+                <th>draft</th>
+                <th>internalLinks</th>
+                <th>externalLinks</th>
+                <th>faqs</th>
+                <th>updatedDate</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-body"></tbody>
+          </table>
+        </div>
         <pre id="dashboard-status" aria-live="polite"></pre>
       </section>
     </main>
