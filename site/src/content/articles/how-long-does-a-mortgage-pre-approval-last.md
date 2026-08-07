@@ -210,15 +210,7 @@ The mechanics of pre-approval are straightforward once you understand them. The 
 
 ## Where Things Stand
 <!-- WHERE-THINGS-STAND:START -->
-The core rules governing mortgage pre-approval validity have not changed recently, but the market context surrounding them has made timing more consequential than ever for buyers entering mid-2026. 
-The 30-year fixed-rate mortgage averaged 6.66% in July 2026 according to Freddie Mac, and the Federal Reserve held rates steady at its July 28–29 FOMC meeting
- — leaving buyers in a holding pattern that strains pre-approval windows. 
-Homebuyer affordability improved modestly in June, with the national median mortgage payment applied for by purchase applicants decreasing slightly to $2,191
-, but rates have since edged higher, meaning that a pre-approval letter issued even a few weeks ago may reflect materially different purchasing power today. 
-For the first time in four years, home sales increased during the spring season, and despite elevated mortgage rates, tight inventory, and affordability challenges, buyers returned to the market
- — a dynamic that makes having a current, valid pre-approval especially important as competition picks back up. 
-Homes sold faster than they did a year ago for the second time in four weeks, and active inventory held above 1.1 million properties for the sixth consecutive week
-, suggesting that buyers who arrive at the table with stale or expired letters face real risk of losing homes in a market that is moving more quickly than it did a year ago.
+The core rules governing mortgage pre-approval validity have not changed, but the market context has grown more consequential since mid-summer. The 30-year fixed-rate mortgage rose to 6.69% as of August 6, 2026 — up from 6.66% the prior week and higher than a year ago — according to Freddie Mac, as inflation concerns and geopolitical uncertainty pushed rates to their highest level in more than a year. The Federal Reserve held rates steady at its July 28–29 FOMC meeting, with three dissenting votes, and the next decision is not until September 15–16, meaning buyers remain in a prolonged holding pattern. That rate climb is already cooling demand: MBA data for the week ending July 31 showed mortgage applications fell 2.9%, with purchase activity down 4% week-over-week and trailing last year's pace. Meanwhile, the housing market may be nearing its 2026 peak, with Zillow estimating a 7.7% month-over-month drop in pending sales in July — a sign that a pre-approval letter issued even weeks ago may no longer accurately reflect today's purchasing power or market conditions.
 <!-- WHERE-THINGS-STAND:END -->
 
 See Related Reads below for more on this topic.

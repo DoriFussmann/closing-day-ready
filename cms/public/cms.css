@@ -1259,3 +1259,163 @@ pre:empty,
 .health-speed-status.is-error {
   color: var(--error);
 }
+
+/* —— Articles Update —— */
+
+.update-unmatched-panel {
+  border-color: color-mix(in srgb, var(--error) 45%, var(--border));
+  background: color-mix(in srgb, var(--error) 6%, #fff);
+}
+
+.update-unmatched-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.update-unmatched-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--error) 35%, var(--border));
+  border-radius: var(--radius-btn);
+  background: #fff;
+  font-size: 0.8125rem;
+}
+
+.update-unmatched-item strong {
+  color: var(--error);
+  font-weight: 600;
+}
+
+.update-review-help {
+  margin: 0 0 0.85rem;
+}
+
+.update-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.update-review-card {
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.update-review-card.is-confirmed {
+  border-color: color-mix(in srgb, var(--success) 40%, var(--border));
+  background: color-mix(in srgb, var(--success) 5%, #fff);
+}
+
+.update-review-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.update-review-header h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--heading);
+}
+
+.update-flag {
+  margin: 0 0 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-btn);
+  font-size: 0.8125rem;
+}
+
+.update-flag.is-error {
+  border: 1px solid color-mix(in srgb, var(--error) 40%, var(--border));
+  background: color-mix(in srgb, var(--error) 8%, #fff);
+  color: var(--error);
+}
+
+.update-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+@media (max-width: 800px) {
+  .update-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.update-compare-col h4,
+.update-sources h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.update-paragraph {
+  margin: 0;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.update-sources-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.update-source-label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: start;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.update-source-title {
+  display: block;
+  color: var(--heading);
+  font-weight: 500;
+}
+
+.update-source-label a {
+  display: block;
+  word-break: break-all;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.update-card-status {
+  margin: 0.65rem 0 0;
+}
+
+.update-card-status[data-error="true"] {
+  color: var(--error);
+}

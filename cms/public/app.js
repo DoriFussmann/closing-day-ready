@@ -29,6 +29,7 @@ function pageKind() {
   if (path.endsWith("dashboard.html")) return "dashboard";
   if (path.endsWith("add-article.html")) return "article-form";
   if (path.endsWith("articles-health.html")) return "articles-health";
+  if (path.endsWith("articles-update.html")) return "articles-update";
   return "article-list";
 }
 
@@ -1779,6 +1780,336 @@ async function initArticlesHealth() {
   await refreshArticlesHealth();
 }
 
+/* ---------------- Articles Update ---------------- */
+
+const articlesUpdateSession = {
+  updatedSlugs: new Set(),
+  matched: [],
+  unmatched: [],
+  confirmed: new Set(),
+  batchRunning: false,
+};
+
+function updateArticlesUpdateBanner() {
+  const banner = document.getElementById("update-session-banner");
+  if (!banner) return;
+  const n = articlesUpdateSession.updatedSlugs.size;
+  if (!n) {
+    banner.hidden = true;
+    banner.textContent = "";
+    return;
+  }
+  banner.hidden = false;
+  banner.textContent = `${n} article${n === 1 ? "" : "s"} updated this session — remember to commit, push, and deploy.`;
+}
+
+function renderArticlesUpdateUnmatched() {
+  const panel = document.getElementById("update-unmatched-panel");
+  const list = document.getElementById("update-unmatched-list");
+  if (!panel || !list) return;
+  const rows = articlesUpdateSession.unmatched || [];
+  if (!rows.length) {
+    panel.hidden = true;
+    list.innerHTML = "";
+    return;
+  }
+  panel.hidden = false;
+  list.innerHTML = rows
+    .map(
+      (row) => `<li class="update-unmatched-item">
+        <strong>${escapeHtml(row.slug)}</strong>
+        <span>${escapeHtml(row.reason || "No matching local article")}</span>
+      </li>`
+    )
+    .join("");
+}
+
+function renderArticlesUpdateReview() {
+  const panel = document.getElementById("update-review-panel");
+  const list = document.getElementById("update-review-list");
+  const confirmAll = document.getElementById("update-confirm-all");
+  if (!panel || !list) return;
+
+  const rows = articlesUpdateSession.matched || [];
+  if (!rows.length) {
+    panel.hidden = true;
+    list.innerHTML = "";
+    if (confirmAll) confirmAll.disabled = true;
+    return;
+  }
+
+  panel.hidden = false;
+  const pending = rows.filter((r) => !articlesUpdateSession.confirmed.has(r.slug));
+  if (confirmAll) {
+    confirmAll.disabled = articlesUpdateSession.batchRunning || pending.length === 0;
+  }
+
+  list.innerHTML = rows
+    .map((row) => {
+      const confirmed = articlesUpdateSession.confirmed.has(row.slug);
+      const sources = Array.isArray(row.newSources) ? row.newSources : [];
+      const sourcesHtml = sources.length
+        ? `<div class="update-sources">
+            <h4>New sources (opt-in)</h4>
+            <ul class="update-sources-list">
+              ${sources
+                .map(
+                  (src, idx) => `<li>
+                    <label class="update-source-label">
+                      <input
+                        type="checkbox"
+                        data-role="update-source"
+                        data-slug="${escapeAttr(row.slug)}"
+                        data-index="${idx}"
+                        ${confirmed ? "disabled" : ""}
+                      />
+                      <span>
+                        <span class="update-source-title">${escapeHtml(src.title)}</span>
+                        <a href="${escapeAttr(src.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(src.url)}</a>
+                      </span>
+                    </label>
+                  </li>`
+                )
+                .join("")}
+            </ul>
+          </div>`
+        : `<p class="health-meta">No new sources in this update.</p>`;
+
+      const markerWarning = row.markersPresent
+        ? ""
+        : `<p class="update-flag is-error">WHERE-THINGS-STAND markers missing in local file — Confirm Update will fail until markers are present.</p>`;
+
+      return `<article class="update-review-card${confirmed ? " is-confirmed" : ""}" data-slug="${escapeAttr(row.slug)}">
+        <div class="update-review-header">
+          <div>
+            <h3>${escapeHtml(row.title || row.slug)}</h3>
+            <p class="health-meta">
+              slug: <code>${escapeHtml(row.slug)}</code>
+              · current updatedDate: <code>${escapeHtml(row.currentUpdatedDate || "—")}</code>
+              · proposed: <code>${escapeHtml(row.newUpdatedDate)}</code>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="btn-primary"
+            data-action="confirm-update"
+            data-slug="${escapeAttr(row.slug)}"
+            ${confirmed || articlesUpdateSession.batchRunning ? "disabled" : ""}
+          >
+            ${confirmed ? "Updated" : "Confirm Update"}
+          </button>
+        </div>
+        ${markerWarning}
+        <div class="update-compare">
+          <div class="update-compare-col">
+            <h4>Current</h4>
+            <pre class="update-paragraph">${escapeHtml(row.currentParagraph || "(empty or markers missing)")}</pre>
+          </div>
+          <div class="update-compare-col">
+            <h4>Proposed</h4>
+            <pre class="update-paragraph">${escapeHtml(row.newParagraph)}</pre>
+          </div>
+        </div>
+        ${sourcesHtml}
+        <p class="update-card-status health-meta" data-role="card-status" hidden></p>
+      </article>`;
+    })
+    .join("");
+}
+
+function getSelectedSourcesForSlug(slug) {
+  const row = articlesUpdateSession.matched.find((r) => r.slug === slug);
+  if (!row) return [];
+  const sources = Array.isArray(row.newSources) ? row.newSources : [];
+  const card = document.querySelector(`.update-review-card[data-slug="${CSS.escape(slug)}"]`);
+  if (!card) return [];
+  const checked = [...card.querySelectorAll('input[data-role="update-source"]:checked')];
+  return checked
+    .map((input) => sources[Number(input.dataset.index)])
+    .filter((s) => s && s.title && s.url)
+    .map((s) => ({ title: s.title, url: s.url }));
+}
+
+async function confirmArticleUpdate(slug, selectedSourcesOverride) {
+  const row = articlesUpdateSession.matched.find((r) => r.slug === slug);
+  if (!row) throw new Error(`No matched update for ${slug}`);
+  if (articlesUpdateSession.confirmed.has(slug)) return { already: true };
+
+  const selectedSources =
+    selectedSourcesOverride !== undefined
+      ? selectedSourcesOverride
+      : getSelectedSourcesForSlug(slug);
+  const data = await parseJsonResponse(
+    await fetch("/api/articles-update/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug: row.slug,
+        newParagraph: row.newParagraph,
+        newUpdatedDate: row.newUpdatedDate,
+        selectedSources,
+      }),
+    })
+  );
+
+  articlesUpdateSession.confirmed.add(slug);
+  articlesUpdateSession.updatedSlugs.add(slug);
+  updateArticlesUpdateBanner();
+  return data;
+}
+
+async function runConfirmAllArticleUpdates() {
+  if (articlesUpdateSession.batchRunning) return;
+  const pending = articlesUpdateSession.matched.filter(
+    (r) => !articlesUpdateSession.confirmed.has(r.slug)
+  );
+  if (!pending.length) return;
+
+  // Snapshot opt-in sources before any re-render clears checkboxes.
+  const plans = pending.map((row) => ({
+    row,
+    selectedSources: getSelectedSourcesForSlug(row.slug),
+  }));
+
+  articlesUpdateSession.batchRunning = true;
+  renderArticlesUpdateReview();
+  const statusEl = document.getElementById("update-status");
+
+  try {
+    for (let i = 0; i < plans.length; i += 1) {
+      const { row, selectedSources } = plans[i];
+      setStatus(
+        statusEl,
+        `Confirming ${i + 1} of ${plans.length}: ${row.title || row.slug}`
+      );
+      const cardStatus = document.querySelector(
+        `.update-review-card[data-slug="${CSS.escape(row.slug)}"] [data-role="card-status"]`
+      );
+      try {
+        const data = await confirmArticleUpdate(row.slug, selectedSources);
+        if (cardStatus) {
+          cardStatus.hidden = false;
+          const written = data.sourcesWritten?.length || 0;
+          cardStatus.textContent = written
+            ? `Updated. Added ${written} source(s).`
+            : "Updated.";
+        }
+      } catch (err) {
+        if (cardStatus) {
+          cardStatus.hidden = false;
+          cardStatus.textContent = err.message;
+          cardStatus.dataset.error = "true";
+        }
+        setStatus(statusEl, err.message, true);
+        throw err;
+      }
+      renderArticlesUpdateReview();
+    }
+    setStatus(
+      statusEl,
+      `Confirmed ${plans.length} article${plans.length === 1 ? "" : "s"}.`
+    );
+  } finally {
+    articlesUpdateSession.batchRunning = false;
+    renderArticlesUpdateReview();
+  }
+}
+
+async function handleArticlesUpdateDrop(files) {
+  const file = files.find(
+    (f) =>
+      f.name.toLowerCase().endsWith(".json") ||
+      f.name.toLowerCase().endsWith(".md") ||
+      f.type === "application/json" ||
+      f.type === "text/markdown" ||
+      f.type === "text/plain"
+  );
+  const statusEl = document.getElementById("update-drop-status");
+  if (!file) {
+    setStatus(statusEl, "Please drop a .json or .md update file.", true);
+    return;
+  }
+  if (file.size > MAX_FILE_BYTES) {
+    setStatus(statusEl, "File exceeds 10MB limit.", true);
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("file", file);
+  try {
+    setStatus(statusEl, `Parsing ${file.name}…`);
+    const data = await parseJsonResponse(
+      await fetch("/api/articles-update/preview", { method: "POST", body: fd })
+    );
+    articlesUpdateSession.matched = data.matched || [];
+    articlesUpdateSession.unmatched = data.unmatched || [];
+    articlesUpdateSession.confirmed = new Set();
+    renderArticlesUpdateUnmatched();
+    renderArticlesUpdateReview();
+    const matchedN = articlesUpdateSession.matched.length;
+    const unmatchedN = articlesUpdateSession.unmatched.length;
+    setStatus(
+      statusEl,
+      `${file.name}: ${matchedN} matched, ${unmatchedN} unmatched (of ${data.total}).`
+    );
+    setStatus(document.getElementById("update-status"), "");
+  } catch (err) {
+    setStatus(statusEl, err.message, true);
+  }
+}
+
+function initArticlesUpdate() {
+  const drop = document.getElementById("update-drop");
+  if (!drop) return;
+
+  bindDropZone(drop, (files) => {
+    void handleArticlesUpdateDrop(files);
+  }, {
+    inputId: "update-file-input",
+    accept: ".json,.md,application/json,text/markdown,text/plain",
+  });
+
+  document.getElementById("update-confirm-all")?.addEventListener("click", () => {
+    void runConfirmAllArticleUpdates().catch((err) => {
+      setStatus(document.getElementById("update-status"), err.message, true);
+    });
+  });
+
+  document.getElementById("update-review-list")?.addEventListener("click", (e) => {
+    const btn = e.target.closest('[data-action="confirm-update"]');
+    if (!btn) return;
+    const slug = btn.getAttribute("data-slug");
+    if (!slug || articlesUpdateSession.batchRunning) return;
+    void (async () => {
+      const statusEl = document.getElementById("update-status");
+      const cardStatus = document.querySelector(
+        `.update-review-card[data-slug="${CSS.escape(slug)}"] [data-role="card-status"]`
+      );
+      try {
+        btn.disabled = true;
+        setStatus(statusEl, `Confirming ${slug}…`);
+        const data = await confirmArticleUpdate(slug);
+        const written = data.sourcesWritten?.length || 0;
+        if (cardStatus) {
+          cardStatus.hidden = false;
+          cardStatus.textContent = written
+            ? `Updated. Added ${written} source(s).`
+            : "Updated.";
+        }
+        setStatus(statusEl, `Updated ${slug}.`);
+        renderArticlesUpdateReview();
+      } catch (err) {
+        btn.disabled = false;
+        if (cardStatus) {
+          cardStatus.hidden = false;
+          cardStatus.textContent = err.message;
+        }
+        setStatus(statusEl, err.message, true);
+      }
+    })();
+  });
+}
+
 /* ---------------- Boot ---------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1796,4 +2127,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (kind === "articles-health") void initArticlesHealth().catch((err) => {
     setStatus(document.getElementById("health-status"), err.message, true);
   });
+  if (kind === "articles-update") initArticlesUpdate();
 });

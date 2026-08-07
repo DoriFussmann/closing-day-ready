@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Articles Update — Closing Day Ready CMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/cms.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-nav">
+        <a class="brand" href="/">Closing Day Ready CMS</a>
+        <ul class="nav-links">
+          <li><a href="/">Articles</a></li>
+          <li><a href="/team.html">Team</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <div class="cms-shell">
+      <aside class="cms-sidebar" aria-label="Articles navigation">
+        <ul class="sidebar-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="/add-article.html">Add Article</a></li>
+          <li><a href="/articles-health.html">Articles Health</a></li>
+          <li><a href="/articles-update.html" aria-current="page">Articles Update</a></li>
+        </ul>
+      </aside>
+
+      <div class="cms-main">
+        <div class="page-hero">
+          <div class="container">
+            <h1>Articles Update</h1>
+            <p>
+              Drop a TNV Articles Update batch export (JSON array or YAML-frontmatter
+              <code>.md</code>). Review each Where Things Stand paragraph, opt in to
+              new sources, then confirm per article or all at once.
+            </p>
+          </div>
+        </div>
+
+        <main class="container">
+          <div id="update-session-banner" class="health-banner" hidden></div>
+
+          <section class="panel" aria-labelledby="update-drop-heading">
+            <h2 id="update-drop-heading">Batch export file</h2>
+            <p id="update-drop" class="dropzone" tabindex="0" role="button" aria-controls="update-file-input">
+              Drop a TNV article-updates .json or .md file here, or click to browse
+            </p>
+            <input
+              id="update-file-input"
+              type="file"
+              accept=".json,.md,application/json,text/markdown,text/plain"
+              hidden
+            />
+            <p id="update-drop-status" class="status-box"></p>
+          </section>
+
+          <section
+            id="update-unmatched-panel"
+            class="panel update-unmatched-panel"
+            aria-labelledby="update-unmatched-heading"
+            hidden
+          >
+            <h2 id="update-unmatched-heading">Unmatched slugs</h2>
+            <p class="health-meta">
+              These entries were in the dropped file but have no matching local
+              <code>site/src/content/articles/{slug}.md</code>. They will not be written.
+            </p>
+            <ul id="update-unmatched-list" class="update-unmatched-list"></ul>
+          </section>
+
+          <section
+            id="update-review-panel"
+            class="panel"
+            aria-labelledby="update-review-heading"
+            hidden
+          >
+            <div class="health-toolbar">
+              <h2 id="update-review-heading">Review updates</h2>
+              <div class="health-toolbar-actions">
+                <button type="button" id="update-confirm-all" class="btn-primary">
+                  Confirm All
+                </button>
+              </div>
+            </div>
+            <p class="health-meta update-review-help">
+              New sources are unchecked by default — check each one you want added to
+              <code>externalLinks</code> (with the Sources signpost). Confirm Update
+              replaces only the WHERE-THINGS-STAND marker block and sets
+              <code>updatedDate</code>.
+            </p>
+            <div id="update-review-list" class="update-review-list"></div>
+            <pre id="update-status" aria-live="polite"></pre>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

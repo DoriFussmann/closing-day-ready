@@ -54,6 +54,14 @@ externalLinks:
     url: https://www.nachi.org/sop.htm
   - label: HUD — Buying a home
     url: https://www.hud.gov/buying
+  - label: Home Inspection Waivers Have Crashed To 17% — Inspection Professionals
+    url: https://inspectionprofessionals.net/blog/home-inspection-waivers-have-crashed-to-17/
+  - label: "May 2026 Housing Market: Buyers Gain Leverage With Rising Concessions — Forum Nadlan USA / Redfin data"
+    url: https://www.forumnadlanusa.com/2026/06/us-home-seller-concessions-may-2026/
+  - label: $429,300 Record Median Raises Home Inspection Stakes — Inspection Professionals
+    url: https://inspectionprofessionals.net/blog/median-home-price-record-inspection-stakes/
+  - label: Residential Home Inspections Market Trend, Size & Share — Business Research Insights
+    url: https://www.businessresearchinsights.com/market-reports/residential-home-inspections-market-113029
 ---
 
 # Home Inspection Checklist for Sellers: What to Fix First
@@ -184,15 +192,7 @@ If you're navigating both a sale and a purchase simultaneously, understanding ho
 
 ## Where Things Stand
 <!-- WHERE-THINGS-STAND:START -->
-The home inspection landscape in mid-2026 is tilting meaningfully in buyers' favor, which makes pre-inspection seller preparation more strategically important than at any point in the past few years. 
-In the 2026 market, where inventory is slowly rising, buyers are looking for reasons to negotiate
- — and a lengthy inspection report hands them exactly that ammunition. 
-Most 2026 housing forecasts point to a modest rebound in home sales, not a crash or a speculative surge, and as competition among buyers cools compared to peak years, fewer buyers are willing to waive inspections
-, making thorough reports the norm rather than the exception. On the technology side, 
-thermal imaging was once a luxury add-on, but it is now becoming baseline — infrared technology reveals what the naked eye cannot, including missing insulation, air leakage patterns, moisture intrusion, and hidden electrical hotspots.
- That shift means sellers can no longer rely on cosmetic preparation alone; hidden system deficiencies that once went undetected are increasingly surfacing in standard inspection reports. 
-The global residential home inspections market was valued at approximately $1.7 billion in 2026 and is projected to reach $3.73 billion by 2035
-, reflecting sustained structural growth in buyer due-diligence demand that is unlikely to reverse regardless of how real estate cycles move.
+The home inspection landscape in mid-2026 is tilting firmly in buyers' favor, making pre-listing seller preparation more strategically important than at any point in recent memory. According to the NAR Realtors Confidence Index released June 9, only 17% of buyers waived the home inspection contingency in May 2026 — down sharply from 25% a year earlier — as inventory climbed to 4.5 months of supply and the urgency to skip due diligence eased. Buyers are now keeping inspections in place and using findings as a second round of negotiation: Redfin data shows 46.2% of U.S. home sellers granted concessions in May 2026, a record high for that month, with repair credits after inspection among the most common forms. Meanwhile, virtual and remote inspection methods — video streaming and smart-camera walkthroughs — now account for more than 35% of all inspections, further extending what buyers can scrutinize. Thermal imaging, once an expensive add-on, has become baseline, surfacing hidden moisture, insulation gaps, and electrical hotspots that cosmetic preparation alone cannot conceal. For sellers, the strategic math is straightforward: a clean pre-listing inspection reduces the report-driven negotiation that has become the new normal in 2026.
 <!-- WHERE-THINGS-STAND:END -->
 
 See Related Reads below for more on this topic.

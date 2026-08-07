@@ -573,8 +573,39 @@ function tokenizeKeyword(value: string | undefined): string[] {
     .filter((t) => t.length > 2 && !TOPIC_STOPWORDS.has(t));
 }
 
-function urlKey(url: string): string {
+export function urlKey(url: string): string {
   return url.replace(/\/+$/, "");
+}
+
+/** Merge new external links into an existing list (dedupe by URL). */
+export function mergeExternalLinks(
+  existing: LinkRef[],
+  toAdd: LinkRef[]
+): { links: LinkRef[]; written: LinkRef[]; skipped: Array<LinkRef & { reason: string }> } {
+  const links = [...existing];
+  const present = new Set(links.map((l) => urlKey(l.url)));
+  const written: LinkRef[] = [];
+  const skipped: Array<LinkRef & { reason: string }> = [];
+
+  for (const link of toAdd) {
+    const label = String(link.label || "").trim();
+    const url = String(link.url || "").trim();
+    if (!label || !url) {
+      skipped.push({ label, url, reason: "label and url are required" });
+      continue;
+    }
+    const key = urlKey(url);
+    if (present.has(key)) {
+      skipped.push({ label, url, reason: "External link already present" });
+      continue;
+    }
+    const entry = { label, url };
+    links.push(entry);
+    present.add(key);
+    written.push(entry);
+  }
+
+  return { links, written, skipped };
 }
 
 function mapSourceItem(
@@ -962,7 +993,7 @@ export function addExternalLinksSelected(
       continue;
     }
 
-    const links = Array.isArray(existing.frontmatter.externalLinks)
+    const existingLinks = Array.isArray(existing.frontmatter.externalLinks)
       ? [
           ...(existing.frontmatter.externalLinks as Array<{
             label: string;
@@ -970,26 +1001,19 @@ export function addExternalLinksSelected(
           }>),
         ]
       : [];
-    const present = new Set(links.map((l) => urlKey(l.url)));
-    let changed = false;
-
-    for (const link of linksToAdd) {
-      const key = urlKey(link.url);
-      if (present.has(key)) {
-        skipped.push({ slug, ...link, reason: "External link already present" });
-        continue;
-      }
-      links.push(link);
-      present.add(key);
+    const merged = mergeExternalLinks(existingLinks, linksToAdd);
+    for (const link of merged.written) {
       written.push({ slug, ...link });
-      changed = true;
+    }
+    for (const item of merged.skipped) {
+      skipped.push({ slug, ...item });
     }
 
-    if (!changed) continue;
+    if (!merged.written.length) continue;
 
     const body = ensureSignpost(existing.body, EXTERNAL_SIGNPOST);
     patchArticleContent(slug, {
-      frontmatterPatch: { externalLinks: links },
+      frontmatterPatch: { externalLinks: merged.links },
       body,
       bumpUpdatedDate: true,
     });

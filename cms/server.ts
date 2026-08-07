@@ -31,6 +31,11 @@ import {
   proposeExternalLinks,
 } from "./lib/articlesHealth.js";
 import {
+  applyArticleUpdate,
+  parseArticleUpdateFile,
+  previewArticleUpdates,
+} from "./lib/articlesUpdate.js";
+import {
   isPageSpeedConfigured,
   runPageSpeedScan,
 } from "./lib/pageSpeed.js";
@@ -92,11 +97,14 @@ const upload = multer({
   storage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
+    const name = file.originalname.toLowerCase();
     const ok =
       file.mimetype.startsWith("image/") ||
-      file.originalname.toLowerCase().endsWith(".md") ||
+      name.endsWith(".md") ||
+      name.endsWith(".json") ||
       file.mimetype === "text/markdown" ||
-      file.mimetype === "text/plain";
+      file.mimetype === "text/plain" ||
+      file.mimetype === "application/json";
     cb(null, ok);
   },
 });
@@ -598,6 +606,79 @@ app.post(
   asyncHandler(async (_req, res) => {
     const body = generateLlmsTxt();
     res.json({ ok: true, body });
+  })
+);
+
+app.post(
+  "/api/articles-update/preview",
+  upload.single("file"),
+  asyncHandler(async (req, res) => {
+    let text = "";
+    let filename = "";
+    if (req.file) {
+      text = fs.readFileSync(req.file.path, "utf8");
+      filename = req.file.originalname || req.file.filename;
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch {
+        /* ignore staging cleanup */
+      }
+    } else if (typeof req.body?.text === "string") {
+      text = req.body.text;
+      filename = String(req.body.filename || "");
+    } else {
+      return jsonError(res, 400, "Drop a JSON or YAML-frontmatter .md update file");
+    }
+
+    try {
+      const entries = parseArticleUpdateFile(text, filename);
+      const preview = previewArticleUpdates(entries);
+      res.json({
+        ok: true,
+        filename,
+        total: entries.length,
+        ...preview,
+      });
+    } catch (err) {
+      return jsonError(
+        res,
+        400,
+        err instanceof Error ? err.message : "Failed to parse update file"
+      );
+    }
+  })
+);
+
+app.post(
+  "/api/articles-update/confirm",
+  asyncHandler(async (req, res) => {
+    const slug = String(req.body?.slug || "").trim();
+    const newParagraph = String(req.body?.newParagraph || "").trim();
+    const newUpdatedDate = String(req.body?.newUpdatedDate || "").trim();
+    const selectedSources = Array.isArray(req.body?.selectedSources)
+      ? req.body.selectedSources.map(
+          (s: { title?: string; url?: string; label?: string }) => ({
+            title: String(s?.title || s?.label || "").trim(),
+            url: String(s?.url || "").trim(),
+          })
+        )
+      : [];
+
+    try {
+      const result = applyArticleUpdate({
+        slug,
+        newParagraph,
+        newUpdatedDate,
+        selectedSources,
+      });
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      return jsonError(
+        res,
+        400,
+        err instanceof Error ? err.message : "Failed to confirm update"
+      );
+    }
   })
 );
 
