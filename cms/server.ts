@@ -27,6 +27,7 @@ import {
   ensureSignpost,
   EXTERNAL_SIGNPOST,
   INTERNAL_SIGNPOST,
+  mergeExternalLinks,
   proposeAllExternalLinks,
   proposeExternalLinks,
 } from "./lib/articlesHealth.js";
@@ -480,21 +481,26 @@ app.post(
     const existing = readArticleFile(req.params.slug);
     if (!existing) return jsonError(res, 404, "Article not found");
 
-    const links = Array.isArray(existing.frontmatter.externalLinks)
+    const existingLinks = Array.isArray(existing.frontmatter.externalLinks)
       ? [...(existing.frontmatter.externalLinks as Array<{ label: string; url: string }>)]
       : [];
-    if (links.some((l) => l.url.replace(/\/+$/, "") === url.replace(/\/+$/, ""))) {
+    const merged = mergeExternalLinks(existingLinks, [{ label, url }]);
+    if (!merged.written.length) {
       return jsonError(res, 400, "External link already present");
     }
-    links.push({ label, url });
 
     const body = ensureSignpost(existing.body, EXTERNAL_SIGNPOST);
     const result = patchArticleContent(req.params.slug, {
-      frontmatterPatch: { externalLinks: links },
+      frontmatterPatch: { externalLinks: merged.links },
       body,
       bumpUpdatedDate: true,
     });
-    res.json({ ok: true, ...result, externalLinks: links });
+    res.json({
+      ok: true,
+      ...result,
+      externalLinks: merged.links,
+      trimmed: merged.trimmed,
+    });
   })
 );
 

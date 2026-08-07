@@ -86,16 +86,24 @@
             <div class="health-toolbar">
               <h2 id="update-review-heading">Review updates</h2>
               <div class="health-toolbar-actions">
+                <button
+                  type="button"
+                  id="update-download-receipt"
+                  class="btn-secondary"
+                  hidden
+                >
+                  Download Confirmation Receipt
+                </button>
                 <button type="button" id="update-confirm-all" class="btn-primary">
                   Confirm All
                 </button>
               </div>
             </div>
             <p class="health-meta update-review-help">
-              New sources are unchecked by default — check each one you want added to
-              <code>externalLinks</code> (with the Sources signpost). Confirm Update
-              replaces only the WHERE-THINGS-STAND marker block and sets
-              <code>updatedDate</code>.
+              New sources are checked by default — uncheck any you do not want added to
+              <code>externalLinks</code> (with the Sources signpost; max 5 total, oldest
+              dropped first). Confirm Update replaces only the WHERE-THINGS-STAND marker
+              block and sets <code>updatedDate</code>.
             </p>
             <div id="update-review-list" class="update-review-list"></div>
             <pre id="update-status" aria-live="polite"></pre>

@@ -1,4 +1,4 @@
-/* global document, window, fetch, FormData, File, URLSearchParams */
+/* global document, window, fetch, FormData, File, URLSearchParams, Blob, URL */
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
@@ -1787,8 +1787,66 @@ const articlesUpdateSession = {
   matched: [],
   unmatched: [],
   confirmed: new Set(),
+  receipts: [],
   batchRunning: false,
 };
+
+function downloadJsonFile(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function confirmationReceiptFilename(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `article-update-confirmations-${y}-${m}-${d}.json`;
+}
+
+function recordArticlesUpdateReceipt({ slug, confirmedDate, confirmedAt }) {
+  const entry = {
+    slug: String(slug || "").trim(),
+    confirmedDate: String(confirmedDate || "").trim(),
+    confirmedAt: String(confirmedAt || new Date().toISOString()),
+  };
+  if (!entry.slug || !entry.confirmedDate) return;
+
+  const existing = articlesUpdateSession.receipts.findIndex(
+    (row) => row.slug === entry.slug
+  );
+  if (existing >= 0) articlesUpdateSession.receipts[existing] = entry;
+  else articlesUpdateSession.receipts.push(entry);
+  updateArticlesUpdateReceiptButton();
+}
+
+function updateArticlesUpdateReceiptButton() {
+  const btn = document.getElementById("update-download-receipt");
+  if (!btn) return;
+  const n = articlesUpdateSession.receipts.length;
+  btn.hidden = n === 0;
+  btn.disabled = n === 0;
+  btn.textContent =
+    n > 0
+      ? `Download Confirmation Receipt (${n})`
+      : "Download Confirmation Receipt";
+}
+
+function downloadArticlesUpdateReceipt() {
+  if (!articlesUpdateSession.receipts.length) return;
+  downloadJsonFile(
+    confirmationReceiptFilename(),
+    articlesUpdateSession.receipts
+  );
+}
 
 function updateArticlesUpdateBanner() {
   const banner = document.getElementById("update-session-banner");
@@ -1861,7 +1919,7 @@ function renderArticlesUpdateReview() {
                         data-role="update-source"
                         data-slug="${escapeAttr(row.slug)}"
                         data-index="${idx}"
-                        ${confirmed ? "disabled" : ""}
+                        ${confirmed ? "disabled" : "checked"}
                       />
                       <span>
                         <span class="update-source-title">${escapeHtml(src.title)}</span>
@@ -1954,6 +2012,11 @@ async function confirmArticleUpdate(slug, selectedSourcesOverride) {
 
   articlesUpdateSession.confirmed.add(slug);
   articlesUpdateSession.updatedSlugs.add(slug);
+  recordArticlesUpdateReceipt({
+    slug: data.slug || row.slug,
+    confirmedDate: data.updatedDate || row.newUpdatedDate,
+    confirmedAt: new Date().toISOString(),
+  });
   updateArticlesUpdateBanner();
   return data;
 }
@@ -2044,6 +2107,8 @@ async function handleArticlesUpdateDrop(files) {
     articlesUpdateSession.matched = data.matched || [];
     articlesUpdateSession.unmatched = data.unmatched || [];
     articlesUpdateSession.confirmed = new Set();
+    articlesUpdateSession.receipts = [];
+    updateArticlesUpdateReceiptButton();
     renderArticlesUpdateUnmatched();
     renderArticlesUpdateReview();
     const matchedN = articlesUpdateSession.matched.length;
@@ -2074,6 +2139,12 @@ function initArticlesUpdate() {
       setStatus(document.getElementById("update-status"), err.message, true);
     });
   });
+
+  document.getElementById("update-download-receipt")?.addEventListener("click", () => {
+    downloadArticlesUpdateReceipt();
+  });
+
+  updateArticlesUpdateReceiptButton();
 
   document.getElementById("update-review-list")?.addEventListener("click", (e) => {
     const btn = e.target.closest('[data-action="confirm-update"]');

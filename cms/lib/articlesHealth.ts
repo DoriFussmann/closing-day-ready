@@ -18,6 +18,9 @@ export const EXTERNAL_SIGNPOST =
 export const INTERNAL_SIGNPOST =
   "See Related Reads below for more on this topic.";
 
+/** Cap for every CMS write path that mutates externalLinks. */
+export const MAX_EXTERNAL_LINKS = 5;
+
 export type HealthStatus = "green" | "orange" | "red" | "gray" | "unconfigured";
 
 export type LinkRef = { label: string; url: string };
@@ -577,12 +580,21 @@ export function urlKey(url: string): string {
   return url.replace(/\/+$/, "");
 }
 
-/** Merge new external links into an existing list (dedupe by URL). */
+/**
+ * Merge new external links into an existing list (dedupe by URL), then enforce
+ * MAX_EXTERNAL_LINKS by dropping oldest entries first (newest retained).
+ * Used by Articles Health and Articles Update write paths.
+ */
 export function mergeExternalLinks(
   existing: LinkRef[],
   toAdd: LinkRef[]
-): { links: LinkRef[]; written: LinkRef[]; skipped: Array<LinkRef & { reason: string }> } {
-  const links = [...existing];
+): {
+  links: LinkRef[];
+  written: LinkRef[];
+  skipped: Array<LinkRef & { reason: string }>;
+  trimmed: LinkRef[];
+} {
+  let links = [...existing];
   const present = new Set(links.map((l) => urlKey(l.url)));
   const written: LinkRef[] = [];
   const skipped: Array<LinkRef & { reason: string }> = [];
@@ -605,7 +617,14 @@ export function mergeExternalLinks(
     written.push(entry);
   }
 
-  return { links, written, skipped };
+  let trimmed: LinkRef[] = [];
+  if (links.length > MAX_EXTERNAL_LINKS) {
+    const overflow = links.length - MAX_EXTERNAL_LINKS;
+    trimmed = links.slice(0, overflow);
+    links = links.slice(-MAX_EXTERNAL_LINKS);
+  }
+
+  return { links, written, skipped, trimmed };
 }
 
 function mapSourceItem(

@@ -54,6 +54,16 @@ externalLinks:
     url: https://www.nachi.org/sop.htm
   - label: Consumer Financial Protection Bureau — Getting a mortgage
     url: https://www.consumerfinance.gov/owning-a-home/
+  - label: New Residential Construction June 2026 — U.S. Census Bureau / HUD
+    url: https://www.census.gov/construction/nrc/current/index.html
+  - label: June 2026 Housing Data Shows Mixed Signals — Housing Affordability Institute
+    url: https://www.housingaffordabilityinstitute.org/june-2026-census-bps/
+  - label: U.S. Housing Starts and Permits (June 2026) — TD Economics
+    url: https://economics.td.com/us-housing-starts-and-permits
+  - label: NSPIRE Official Notices and Proposed Rules — HUD.gov
+    url: https://www.hud.gov/reac/nspire-notices
+  - label: "National Standards for the Physical Inspection of Real Estate: Implementation Guidance — Federal Register"
+    url: https://www.federalregister.gov/documents/2026/04/14/2026-07176/national-standards-for-the-physical-inspection-of-real-estate-implementation-guidance-and-inspection
 ---
 
 ## Why New Construction Is Not the Same as Defect-Free
@@ -158,13 +168,7 @@ That is why staying current on your mortgage guidance matters as much as staying
 
 ## Where Things Stand
 <!-- WHERE-THINGS-STAND:START -->
-The new construction inspection landscape is evolving notably in mid-2026. 
-The Congressional Budget Office projects new home construction to reach an annual average of 1.68 million units between 2025 and 2029 — compared to an average of 1.3 million units the previous decade — and industry observers expect that volume to drive meaningfully higher demand for new construction inspections.
- Against that backdrop, 
-11-month warranty inspections are emerging as a standard service in high-growth markets, occurring just before the builder's one-year warranty expires so homeowners can formally document defects before their recourse period ends.
-
-Buyers and lenders are increasingly demanding more detailed due diligence beyond the standard inspection, with bundled inspection protocols — covering foundation, HVAC, roof, and crawl space — now common, as the in-depth approach reduces the risk of major undisclosed defects that could trigger renegotiation post-inspection or post-closing.
- There are no major regulatory changes to new construction inspection requirements in the past 45 days, but the broader trend toward phased, multi-inspection protocols for new builds continues to accelerate with the housing construction boom.
+The new construction inspection landscape is showing more complexity in mid-2026 than a simple boom narrative suggests. The U.S. Census Bureau's June 2026 data (released July 17) showed housing starts rebounding 19% to a seasonally adjusted annual rate of 1.427 million units — yet building permits declined 3% month-over-month and are down year-over-year, with analysts warning that homebuilding activity may remain subdued through the second half of 2026 amid elevated mortgage rates and material costs. That mixed supply picture keeps demand for new construction inspections competitive but uneven. On the regulatory front, HUD's NSPIRE affirmative requirements — covering items such as HVAC performance, GFCI outlets, and guardrails — are scheduled to begin full scoring on October 1, 2026, a deadline relevant to HUD-assisted and multifamily new construction. The ongoing trend toward bundled, phased inspection protocols for new builds — including pre-drywall, final walk-through, and 11-month warranty inspections — continues to accelerate in high-growth markets.
 <!-- WHERE-THINGS-STAND:END -->
 
 See Related Reads below for more on this topic.
