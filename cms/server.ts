@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import multer from "multer";
 import matter from "gray-matter";
+import { loadEnvFiles } from "./lib/loadEnv.js";
 import { articleFrontmatterSchema, teamFrontmatterSchema } from "./lib/schema.js";
 import {
   formatMissingSummary,
@@ -21,12 +22,18 @@ import {
 } from "./lib/writeArticle.js";
 import {
   absoluteArticleUrl,
+  addExternalLinksSelected,
   buildArticlesHealthReport,
   ensureSignpost,
   EXTERNAL_SIGNPOST,
   INTERNAL_SIGNPOST,
+  proposeAllExternalLinks,
   proposeExternalLinks,
 } from "./lib/articlesHealth.js";
+import {
+  isPageSpeedConfigured,
+  runPageSpeedScan,
+} from "./lib/pageSpeed.js";
 import {
   deleteTeamMember,
   knownAuthorSlugs,
@@ -36,6 +43,8 @@ import {
 } from "./lib/writeTeamMember.js";
 import { generateLlmsTxt } from "./lib/generateLlmsTxt.js";
 import { SITE_URL } from "./lib/siteConfig.js";
+
+loadEnvFiles();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -364,6 +373,42 @@ app.get(
   })
 );
 
+app.post(
+  "/api/articles/:slug/pagespeed",
+  asyncHandler(async (req, res) => {
+    if (!isPageSpeedConfigured()) {
+      return jsonError(
+        res,
+        503,
+        "GOOGLE_PAGESPEED_API_KEY is not configured. Add it to cms/.env.local."
+      );
+    }
+
+    const slug = req.params.slug;
+    const article = readArticleFile(slug);
+    if (!article) return jsonError(res, 404, "Article not found");
+    if (article.frontmatter.draft) {
+      return jsonError(
+        res,
+        400,
+        "Scan unavailable — article is not Published, so there is no live URL to test."
+      );
+    }
+
+    const publishedUrl = absoluteArticleUrl(slug);
+    try {
+      const result = await runPageSpeedScan(slug, publishedUrl);
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      return jsonError(
+        res,
+        502,
+        err instanceof Error ? err.message : "PageSpeed scan failed"
+      );
+    }
+  })
+);
+
 app.get(
   "/api/articles/:slug/propose-external",
   asyncHandler(async (req, res) => {
@@ -377,6 +422,42 @@ app.get(
         err instanceof Error ? err.message : "Propose failed"
       );
     }
+  })
+);
+
+app.post(
+  "/api/articles-health/propose-external",
+  asyncHandler(async (req, res) => {
+    try {
+      const slug = req.body?.slug ? String(req.body.slug).trim() : undefined;
+      const result = proposeAllExternalLinks(slug ? { slug } : undefined);
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      return jsonError(
+        res,
+        400,
+        err instanceof Error ? err.message : "Propose all failed"
+      );
+    }
+  })
+);
+
+app.post(
+  "/api/articles-health/add-external-selected",
+  asyncHandler(async (req, res) => {
+    const items = Array.isArray(req.body?.items) ? req.body.items : null;
+    if (!items) {
+      return jsonError(res, 400, "items array is required");
+    }
+    const normalized = items.map(
+      (item: { slug?: string; label?: string; url?: string }) => ({
+        slug: String(item?.slug || "").trim(),
+        label: String(item?.label || "").trim(),
+        url: String(item?.url || "").trim(),
+      })
+    );
+    const result = addExternalLinksSelected(normalized);
+    res.json({ ok: true, ...result });
   })
 );
 

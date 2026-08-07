@@ -39,24 +39,73 @@
             <h1>Articles Health</h1>
             <p>
               Scan published articles across Links, Meta, Schema, Sitemap, and Speed.
-              Links supports Propose / Connect fixes; other categories are diagnostic in v1.
+              Links supports external-link proposals (with review) and internal Connect fixes;
+              other categories are diagnostic in v1.
             </p>
           </div>
         </div>
 
         <main class="container">
           <div id="health-session-banner" class="health-banner" hidden></div>
-          <section class="panel" aria-labelledby="health-list-heading">
+
+          <section
+            id="health-external-review"
+            class="panel health-review-panel"
+            aria-labelledby="health-review-heading"
+            hidden
+          >
             <div class="health-toolbar">
-              <h2 id="health-list-heading">Published articles</h2>
+              <h2 id="health-review-heading">Review proposed external links</h2>
               <div class="health-toolbar-actions">
+                <button type="button" id="health-review-cancel" class="btn-secondary">
+                  Cancel
+                </button>
+                <button type="button" id="health-review-add" class="btn-primary">
+                  Add Selected
+                </button>
+              </div>
+            </div>
+            <p class="health-meta health-review-help">
+              High-confidence matches are pre-checked. Borderline matches are listed unchecked.
+              Nothing is written until you click Add Selected.
+            </p>
+            <div id="health-review-list" class="health-review-list"></div>
+            <pre id="health-review-status" aria-live="polite"></pre>
+          </section>
+
+          <section class="panel" aria-labelledby="health-list-heading" id="health-list-panel">
+            <div class="health-toolbar">
+              <h2 id="health-list-heading">Articles</h2>
+              <div class="health-toolbar-actions">
+                <button type="button" id="health-speed-check-all" class="btn-secondary">
+                  Speed Check All Articles
+                </button>
+                <button type="button" id="health-propose-external-all" class="btn-secondary">
+                  Propose All External Links
+                </button>
                 <button type="button" id="health-connect-all" class="btn-primary">
                   Connect all internal links
                 </button>
                 <button type="button" id="health-refresh" class="btn-secondary">Rescan</button>
               </div>
             </div>
-            <p id="health-batch-progress" class="health-batch-progress" hidden aria-live="polite"></p>
+            <div
+              id="health-batch-progress"
+              class="health-batch-progress"
+              hidden
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <div class="health-batch-progress-inner">
+                <span class="health-batch-spinner" hidden aria-hidden="true"></span>
+                <div class="health-batch-progress-copy">
+                  <p class="health-batch-progress-text"></p>
+                  <div class="health-batch-progress-track" hidden>
+                    <div class="health-batch-progress-bar" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <p id="health-legend" class="health-legend">
               <span><span class="health-dot is-green" aria-hidden="true"></span> healthy</span>
               <span><span class="health-dot is-orange" aria-hidden="true"></span> needs attention</span>

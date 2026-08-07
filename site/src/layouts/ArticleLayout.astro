@@ -30,6 +30,10 @@ if (!authorEntry) {
 const { Content, headings } = await render(article);
 const pageH1 = data.h1 || data.title;
 const updatedDate = data.updatedDate || data.date;
+const calendarDayKey = (d: Date) => d.toISOString().slice(0, 10);
+const showUpdatedDate = data.updatedDate
+  ? calendarDayKey(data.updatedDate) > calendarDayKey(data.date)
+  : false;
 const ogTitle = data.ogTitle || data.title;
 const ogDescription = data.ogDescription || data.description;
 
@@ -124,11 +128,14 @@ const publishedLabel = data.date.toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
 });
-const updatedLabel = updatedDate.toLocaleDateString("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+const updatedLabel =
+  showUpdatedDate && data.updatedDate
+    ? data.updatedDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
 ---
 
 <BaseLayout
@@ -150,7 +157,12 @@ const updatedLabel = updatedDate.toLocaleDateString("en-US", {
     <header class="mb-10">
       <h1 class="mb-4">{pageH1}</h1>
       <p class="mb-2 text-small text-muted">
-        Published on {publishedLabel} · Updated on {updatedLabel}
+        Published on {publishedLabel}
+        {
+          showUpdatedDate && updatedLabel && (
+            <> · Updated on {updatedLabel}</>
+          )
+        }
       </p>
       <p class="mb-8 text-small text-muted">
         <span class="font-normal text-heading">{data.category}</span>

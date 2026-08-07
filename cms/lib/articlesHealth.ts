@@ -1,8 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { readArticleFile, ARTICLES_DIR } from "./writeArticle.js";
+import {
+  readArticleFile,
+  patchArticleContent,
+  ARTICLES_DIR,
+} from "./writeArticle.js";
 import { SITE_URL } from "./siteConfig.js";
+import { getCachedPageSpeed } from "./pageSpeed.js";
 import YAML from "yaml";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -369,40 +374,96 @@ function scanSitemap(article: ArticleRecord) {
   };
 }
 
-function scanSpeed() {
-  const configured = Boolean(process.env.GOOGLE_PAGESPEED_API_KEY);
+function scanSpeed(article: ArticleRecord) {
+  const configured = Boolean(process.env.GOOGLE_PAGESPEED_API_KEY?.trim());
+  const publishedUrl = article.draft ? null : absoluteArticleUrl(article.slug);
+
+  if (!publishedUrl) {
+    return {
+      status: "gray" as HealthStatus,
+      findings: [
+        "Scan unavailable — article is not Published, so there is no live URL to test.",
+      ],
+      publishedUrl: null,
+      canScan: false,
+      scanned: false,
+      mobile: null as null,
+      desktop: null as null,
+      indicatorScore: null as number | null,
+      indicatorLabel: "mobile Performance" as const,
+      fetchedAt: null as string | null,
+    };
+  }
+
   if (!configured) {
     return {
       status: "unconfigured" as HealthStatus,
       findings: [
-        "Not configured — add GOOGLE_PAGESPEED_API_KEY to enable PageSpeed checks.",
+        "Not configured — add GOOGLE_PAGESPEED_API_KEY to cms/.env.local to enable PageSpeed scans.",
       ],
-      mobile: null as number | null,
-      desktop: null as number | null,
+      publishedUrl,
+      canScan: false,
+      scanned: false,
+      mobile: null as null,
+      desktop: null as null,
+      indicatorScore: null as number | null,
+      indicatorLabel: "mobile Performance" as const,
+      fetchedAt: null as string | null,
     };
   }
+
+  const canScan = true;
+
+  const cached = getCachedPageSpeed(article.slug);
+  if (!cached) {
+    return {
+      status: "gray" as HealthStatus,
+      findings: [
+        "Not scanned yet — click Scan to run Google PageSpeed Insights (mobile + desktop).",
+      ],
+      publishedUrl,
+      canScan,
+      scanned: false,
+      mobile: null as null,
+      desktop: null as null,
+      indicatorScore: null as number | null,
+      indicatorLabel: "mobile Performance" as const,
+      fetchedAt: null as string | null,
+    };
+  }
+
   return {
-    status: "gray" as HealthStatus,
+    status: cached.status as HealthStatus,
     findings: [
-      "PageSpeed API key detected, but live scoring is not enabled in this version.",
+      `Last scan ${cached.fetchedAt.slice(0, 10)} · indicator = ${cached.indicatorLabel} (${cached.indicatorScore}/100).`,
     ],
-    mobile: null as number | null,
-    desktop: null as number | null,
+    publishedUrl,
+    canScan,
+    scanned: true,
+    mobile: cached.mobile,
+    desktop: cached.desktop,
+    indicatorScore: cached.indicatorScore,
+    indicatorLabel: cached.indicatorLabel,
+    fetchedAt: cached.fetchedAt,
   };
 }
 
 export function buildArticlesHealthReport() {
   const all = loadAllArticles();
-  const pagespeedConfigured = Boolean(process.env.GOOGLE_PAGESPEED_API_KEY);
-  const articles = published(all).map((article) => {
+  const pagespeedConfigured = Boolean(process.env.GOOGLE_PAGESPEED_API_KEY?.trim());
+  // Include drafts so Speed can show the disabled "not Published" state.
+  const articles = all.map((article) => {
     const links = scanLinks(article, all);
     const meta = scanMeta(article);
     const schema = scanSchema(article);
     const sitemap = scanSitemap(article);
-    const speed = scanSpeed();
+    const speed = scanSpeed(article);
+    const publishedUrl = article.draft ? null : absoluteArticleUrl(article.slug);
     return {
       slug: article.slug,
       title: article.title,
+      draft: article.draft,
+      publishedUrl,
       pillarKeyword: article.pillarKeyword || null,
       supportingKeyword: article.supportingKeyword || null,
       articleType: article.articleType || null,
@@ -425,27 +486,153 @@ export function buildArticlesHealthReport() {
   };
 }
 
-type SourceCandidate = { title: string; url: string; source: string };
+export type SourceCandidate = {
+  title: string;
+  url: string;
+  source: string;
+  note?: string;
+  confidence?: "high" | "borderline";
+};
 
-function loadWtsSources(): SourceCandidate[] {
-  if (!fs.existsSync(WTS_SOURCES_PATH)) return [];
+export type ProposedExternalLink = {
+  id: string;
+  articleSlug: string;
+  articleTitle: string;
+  title: string;
+  url: string;
+  source: string;
+  confidence: "high" | "borderline";
+  preChecked: boolean;
+  slot: number;
+};
+
+type TopicConfidence = "high" | "borderline" | "reject";
+
+const TOPIC_STOPWORDS = new Set([
+  "the",
+  "and",
+  "for",
+  "how",
+  "does",
+  "what",
+  "with",
+  "from",
+  "that",
+  "this",
+  "are",
+  "was",
+  "has",
+  "have",
+  "into",
+  "your",
+  "you",
+  "can",
+  "not",
+  "volume",
+  "data",
+  "guide",
+  "complete",
+  "best",
+]);
+
+/** Too generic alone to prove topical fit (e.g. "home" matching HUD buying-a-home). */
+const WEAK_TOPIC_TOKENS = new Set([
+  "home",
+  "homes",
+  "house",
+  "houses",
+  "buy",
+  "buying",
+  "buyer",
+  "buyers",
+  "sell",
+  "selling",
+  "seller",
+  "sellers",
+  "new",
+  "long",
+  "take",
+  "last",
+  "better",
+  "report",
+  "checklist",
+]);
+
+function normalizeKeyword(value: string | undefined): string {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenizeKeyword(value: string | undefined): string[] {
+  return normalizeKeyword(value)
+    .split(/[\s-]+/)
+    .filter((t) => t.length > 2 && !TOPIC_STOPWORDS.has(t));
+}
+
+function urlKey(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
+function mapSourceItem(
+  item: { url?: string; note?: string; title?: string },
+  source: string
+): SourceCandidate | null {
+  const url = String(item.url || "").trim();
+  if (!url.startsWith("http")) return null;
+  if (url.includes("closingdayready.com")) return null;
+  return {
+    url,
+    title: String(item.title || item.note || url).trim(),
+    note: item.note ? String(item.note) : undefined,
+    source,
+  };
+}
+
+/**
+ * where-things-stand-sources.json supports:
+ * - legacy array of sources
+ * - { sources: [...], byArticle: { [slug]: [...] } }
+ */
+function loadWtsPools(slug: string): {
+  primary: SourceCandidate[];
+  fallback: SourceCandidate[];
+} {
+  if (!fs.existsSync(WTS_SOURCES_PATH)) {
+    return { primary: [], fallback: [] };
+  }
   try {
     const raw = JSON.parse(fs.readFileSync(WTS_SOURCES_PATH, "utf8"));
-    const list = Array.isArray(raw) ? raw : raw.sources;
-    if (!Array.isArray(list)) return [];
-    return list
-      .map((item: { url?: string; note?: string; title?: string }) => {
-        const url = String(item.url || "").trim();
-        if (!url.startsWith("http")) return null;
-        return {
-          url,
-          title: String(item.title || item.note || url).trim(),
-          source: "whereThingsStandSources",
-        };
-      })
+    if (Array.isArray(raw)) {
+      return {
+        primary: [],
+        fallback: raw
+          .map((item) => mapSourceItem(item, "whereThingsStandSources"))
+          .filter((x): x is SourceCandidate => Boolean(x)),
+      };
+    }
+    const global = Array.isArray(raw.sources)
+      ? raw.sources
+          .map((item: { url?: string; note?: string; title?: string }) =>
+            mapSourceItem(item, "whereThingsStandSources")
+          )
+          .filter((x: SourceCandidate | null): x is SourceCandidate => Boolean(x))
+      : [];
+    const byArticle = raw.byArticle && typeof raw.byArticle === "object"
+      ? raw.byArticle
+      : {};
+    const articleList = Array.isArray(byArticle[slug]) ? byArticle[slug] : [];
+    const primary = articleList
+      .map((item: { url?: string; note?: string; title?: string }) =>
+        mapSourceItem(item, "whereThingsStandSources:article")
+      )
       .filter((x: SourceCandidate | null): x is SourceCandidate => Boolean(x));
+    return { primary, fallback: global };
   } catch {
-    return [];
+    return { primary: [], fallback: [] };
   }
 }
 
@@ -466,32 +653,349 @@ function extractBodyExternalLinks(body: string): SourceCandidate[] {
   return out;
 }
 
+function stemToken(token: string): string {
+  return token.endsWith("s") && token.length > 4 ? token.slice(0, -1) : token;
+}
+
+function partitionTopicTokens(tokens: string[]): {
+  strong: string[];
+  weak: string[];
+} {
+  const strong: string[] = [];
+  const weak: string[] = [];
+  for (const token of tokens) {
+    if (WEAK_TOPIC_TOKENS.has(token) || WEAK_TOPIC_TOKENS.has(stemToken(token))) {
+      weak.push(token);
+    } else {
+      strong.push(token);
+    }
+  }
+  return { strong, weak };
+}
+
+function countHits(tokens: string[], haystack: string): number {
+  return tokens.filter((t) => haystack.includes(t) || haystack.includes(stemToken(t)))
+    .length;
+}
+
+/**
+ * Score whether a candidate clearly matches the article topic defined by
+ * targetKeyword + pillarKeyword. Rejects off-topic sources before display.
+ */
+export function scoreTopicRelevance(
+  candidate: { title: string; url: string; note?: string },
+  targetKeyword: string | undefined,
+  pillarKeyword: string | undefined
+): TopicConfidence {
+  const target = normalizeKeyword(targetKeyword);
+  const pillar = normalizeKeyword(pillarKeyword);
+  if (!target && !pillar) return "reject";
+
+  const haystack = `${candidate.title} ${candidate.url} ${candidate.note || ""}`
+    .toLowerCase()
+    .replace(/[^a-z0-9\s/-]/g, " ");
+
+  const targetTokens = tokenizeKeyword(targetKeyword);
+  const pillarTokens = tokenizeKeyword(pillarKeyword);
+  const allTokens = [...new Set([...targetTokens, ...pillarTokens])];
+  const { strong, weak } = partitionTopicTokens(allTokens);
+
+  const targetPhraseHit = Boolean(target) && haystack.includes(target);
+  const pillarPhraseHit = Boolean(pillar) && haystack.includes(pillar);
+
+  const strongHits = countHits(strong, haystack);
+  const weakHits = countHits(weak, haystack);
+  const targetStrong = partitionTopicTokens(targetTokens).strong;
+  const pillarStrong = partitionTopicTokens(pillarTokens).strong;
+  const targetStrongHits = countHits(targetStrong, haystack);
+  const pillarStrongHits = countHits(pillarStrong, haystack);
+
+  // If the topic has distinctive tokens (inspection, mortgage, …), require at
+  // least one strong hit. Weak-only matches like "home" on HUD are rejected.
+  if (strong.length > 0 && strongHits === 0 && !targetPhraseHit && !pillarPhraseHit) {
+    return "reject";
+  }
+
+  if (
+    !targetPhraseHit &&
+    !pillarPhraseHit &&
+    strongHits === 0 &&
+    weakHits === 0
+  ) {
+    return "reject";
+  }
+
+  if (
+    targetPhraseHit ||
+    pillarPhraseHit ||
+    (strongHits >= 2 && weakHits >= 0) ||
+    (targetStrongHits >= 1 && pillarStrongHits >= 1) ||
+    (strongHits >= 1 && (targetStrongHits >= 1 || pillarStrongHits >= 1) && weakHits >= 1)
+  ) {
+    return "high";
+  }
+
+  // Single strong token without weak support — still topical, ask for review.
+  if (strongHits >= 1) return "borderline";
+
+  // Weak-only topics (rare) — borderline at best.
+  if (strong.length === 0 && weakHits >= 2) return "borderline";
+
+  return "reject";
+}
+
+function collectCandidatePool(
+  slug: string,
+  body: string
+): SourceCandidate[] {
+  const { primary, fallback } = loadWtsPools(slug);
+  const bodyLinks = extractBodyExternalLinks(body);
+  // Primary (article-specific WTS) first, then fresh search = global WTS + body.
+  const ordered = [...primary, ...fallback, ...bodyLinks];
+  const seen = new Set<string>();
+  const out: SourceCandidate[] = [];
+  for (const c of ordered) {
+    const key = urlKey(c.url);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(c);
+  }
+  return out;
+}
+
+function filterRelevantCandidates(
+  pool: SourceCandidate[],
+  targetKeyword: string | undefined,
+  pillarKeyword: string | undefined,
+  existingUrls: Set<string>
+): Array<SourceCandidate & { confidence: "high" | "borderline" }> {
+  const out: Array<SourceCandidate & { confidence: "high" | "borderline" }> = [];
+  for (const candidate of pool) {
+    const key = urlKey(candidate.url);
+    if (existingUrls.has(key)) continue;
+    const confidence = scoreTopicRelevance(
+      candidate,
+      targetKeyword,
+      pillarKeyword
+    );
+    if (confidence === "reject") continue;
+    out.push({ ...candidate, confidence });
+  }
+  // Prefer high-confidence, then preserve pool order within each band.
+  out.sort((a, b) => {
+    if (a.confidence === b.confidence) return 0;
+    return a.confidence === "high" ? -1 : 1;
+  });
+  return out;
+}
+
+function articleTopicFields(frontmatter: Record<string, unknown>): {
+  targetKeyword?: string;
+  pillarKeyword?: string;
+  title: string;
+} {
+  return {
+    targetKeyword: frontmatter.targetKeyword
+      ? String(frontmatter.targetKeyword)
+      : undefined,
+    pillarKeyword: frontmatter.pillarKeyword
+      ? String(frontmatter.pillarKeyword)
+      : undefined,
+    title: String(frontmatter.title || ""),
+  };
+}
+
+/**
+ * Per-article Propose / Add External Links candidates.
+ * Filters by topic before any candidate is returned for display.
+ */
 export function proposeExternalLinks(slug: string): {
-  proposals: SourceCandidate[];
+  proposals: Array<SourceCandidate & { confidence: "high" | "borderline" }>;
   externalCount: number;
+  slotsNeeded: number;
+  rejectedOffTopic: number;
 } {
   const article = readArticleFile(slug);
   if (!article) throw new Error(`Article not found: ${slug}`);
   const existing = asLinks(article.frontmatter.externalLinks);
-  const existingUrls = new Set(existing.map((l) => l.url.replace(/\/+$/, "")));
+  const existingUrls = new Set(existing.map((l) => urlKey(l.url)));
+  const { targetKeyword, pillarKeyword } = articleTopicFields(
+    article.frontmatter as Record<string, unknown>
+  );
 
-  const pool = [
-    ...loadWtsSources(),
-    ...extractBodyExternalLinks(article.body),
-  ];
-
-  const proposals: SourceCandidate[] = [];
+  const pool = collectCandidatePool(slug, article.body);
+  let rejectedOffTopic = 0;
   for (const candidate of pool) {
-    const key = candidate.url.replace(/\/+$/, "");
-    if (existingUrls.has(key)) continue;
-    if (proposals.some((p) => p.url.replace(/\/+$/, "") === key)) continue;
-    // Prefer non-site URLs
-    if (candidate.url.includes("closingdayready.com")) continue;
-    proposals.push(candidate);
-    if (proposals.length >= 3) break;
+    if (existingUrls.has(urlKey(candidate.url))) continue;
+    if (
+      scoreTopicRelevance(candidate, targetKeyword, pillarKeyword) === "reject"
+    ) {
+      rejectedOffTopic += 1;
+    }
   }
 
-  return { proposals, externalCount: existing.length };
+  const relevant = filterRelevantCandidates(
+    pool,
+    targetKeyword,
+    pillarKeyword,
+    existingUrls
+  );
+  const slotsNeeded = Math.max(0, 3 - existing.length);
+  const proposals = relevant.slice(0, Math.max(slotsNeeded, 3));
+
+  return {
+    proposals,
+    externalCount: existing.length,
+    slotsNeeded,
+    rejectedOffTopic,
+  };
+}
+
+/**
+ * Batch propose for one article or all published articles needing external links.
+ * Does not write — caller must review then add selected.
+ */
+export function proposeAllExternalLinks(options?: {
+  slug?: string;
+}): {
+  proposals: ProposedExternalLink[];
+  articlesScanned: number;
+  articlesNeeding: number;
+} {
+  const all = published(loadAllArticles());
+  const targetSlugs = options?.slug
+    ? all.filter((a) => a.slug === options.slug)
+    : all.filter((a) => a.externalLinks.length < 3);
+
+  if (options?.slug && targetSlugs.length === 0) {
+    throw new Error(`Article not found or not published: ${options.slug}`);
+  }
+
+  const proposals: ProposedExternalLink[] = [];
+  let articlesNeeding = 0;
+
+  for (const article of targetSlugs) {
+    const slotsNeeded = Math.max(0, 3 - article.externalLinks.length);
+    if (slotsNeeded === 0) continue;
+    articlesNeeding += 1;
+
+    const existingUrls = new Set(article.externalLinks.map((l) => urlKey(l.url)));
+    // Also exclude URLs already proposed in this batch for other articles? No —
+    // same source can be valid for multiple articles if on-topic.
+    const pool = collectCandidatePool(article.slug, article.body);
+    const relevant = filterRelevantCandidates(
+      pool,
+      article.targetKeyword,
+      article.pillarKeyword,
+      existingUrls
+    );
+
+    // One candidate per missing slot (best remaining), plus keep extras? Spec:
+    // "for every missing external link slot" — emit one proposal per slot.
+    const forSlots = relevant.slice(0, slotsNeeded);
+    for (let i = 0; i < forSlots.length; i++) {
+      const c = forSlots[i];
+      proposals.push({
+        id: `${article.slug}::${urlKey(c.url)}`,
+        articleSlug: article.slug,
+        articleTitle: article.title,
+        title: c.title,
+        url: c.url,
+        source: c.source,
+        confidence: c.confidence,
+        preChecked: c.confidence === "high",
+        slot: i + 1,
+      });
+    }
+  }
+
+  return {
+    proposals,
+    articlesScanned: targetSlugs.length,
+    articlesNeeding,
+  };
+}
+
+export function addExternalLinksSelected(
+  items: Array<{ slug: string; label: string; url: string }>
+): {
+  written: Array<{ slug: string; label: string; url: string }>;
+  skipped: Array<{ slug: string; label: string; url: string; reason: string }>;
+} {
+  const written: Array<{ slug: string; label: string; url: string }> = [];
+  const skipped: Array<{
+    slug: string;
+    label: string;
+    url: string;
+    reason: string;
+  }> = [];
+
+  // Group by slug so each article is patched once with all its selected links.
+  const bySlug = new Map<
+    string,
+    Array<{ label: string; url: string }>
+  >();
+  for (const item of items) {
+    const slug = String(item.slug || "").trim();
+    const label = String(item.label || "").trim();
+    const url = String(item.url || "").trim();
+    if (!slug || !label || !url) {
+      skipped.push({
+        slug,
+        label,
+        url,
+        reason: "slug, label, and url are required",
+      });
+      continue;
+    }
+    const list = bySlug.get(slug) || [];
+    list.push({ label, url });
+    bySlug.set(slug, list);
+  }
+
+  for (const [slug, linksToAdd] of bySlug) {
+    const existing = readArticleFile(slug);
+    if (!existing) {
+      for (const link of linksToAdd) {
+        skipped.push({ slug, ...link, reason: "Article not found" });
+      }
+      continue;
+    }
+
+    const links = Array.isArray(existing.frontmatter.externalLinks)
+      ? [
+          ...(existing.frontmatter.externalLinks as Array<{
+            label: string;
+            url: string;
+          }>),
+        ]
+      : [];
+    const present = new Set(links.map((l) => urlKey(l.url)));
+    let changed = false;
+
+    for (const link of linksToAdd) {
+      const key = urlKey(link.url);
+      if (present.has(key)) {
+        skipped.push({ slug, ...link, reason: "External link already present" });
+        continue;
+      }
+      links.push(link);
+      present.add(key);
+      written.push({ slug, ...link });
+      changed = true;
+    }
+
+    if (!changed) continue;
+
+    const body = ensureSignpost(existing.body, EXTERNAL_SIGNPOST);
+    patchArticleContent(slug, {
+      frontmatterPatch: { externalLinks: links },
+      body,
+      bumpUpdatedDate: true,
+    });
+  }
+
+  return { written, skipped };
 }
 
 export function ensureSignpost(body: string, signpost: string): string {

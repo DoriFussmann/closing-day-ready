@@ -800,7 +800,79 @@ const healthSession = {
   updatedSlugs: new Set(),
   batchRunning: false,
   articles: [],
+  speedScanning: new Set(),
 };
+
+function scoreTone(score) {
+  if (typeof score !== "number") return "gray";
+  if (score >= 90) return "green";
+  if (score >= 50) return "orange";
+  return "red";
+}
+
+function renderSpeedScores(speed) {
+  if (!speed?.scanned || !speed.mobile || !speed.desktop) return "";
+  const row = (label, scores) => `
+    <div class="health-speed-strategy">
+      <h4 class="health-meta">${escapeHtml(label)}</h4>
+      <div class="health-speed-scores">
+        ${[
+          ["Perf", scores.performance],
+          ["A11y", scores.accessibility],
+          ["BP", scores.bestPractices],
+          ["SEO", scores.seo],
+        ]
+          .map(
+            ([name, value]) => `<span class="health-speed-score is-${scoreTone(value)}" title="${escapeAttr(name)}">
+              <span class="health-speed-score-label">${escapeHtml(name)}</span>
+              <span class="health-speed-score-value">${escapeHtml(String(value))}</span>
+            </span>`
+          )
+          .join("")}
+      </div>
+    </div>`;
+  return `<div class="health-speed-results">
+    ${row("Mobile", speed.mobile)}
+    ${row("Desktop", speed.desktop)}
+    <p class="health-meta">Collapsed Speed indicator uses <strong>mobile Performance</strong> (${escapeHtml(String(speed.indicatorScore))}/100).</p>
+  </div>`;
+}
+
+function renderSpeedSection(article, speed, indicatorStatus) {
+  const configured = speed?.status !== "unconfigured";
+  const canScan = Boolean(speed?.canScan);
+  const publishedUrl = article.publishedUrl || speed?.publishedUrl || "";
+  const scanning = healthSession.speedScanning.has(article.slug);
+
+  let controls = "";
+  if (!configured) {
+    controls = `<p class="health-meta">Add GOOGLE_PAGESPEED_API_KEY to cms/.env.local to enable scans.</p>`;
+  } else if (!canScan) {
+    controls = `<div class="health-actions">
+      <button type="button" class="btn-secondary" data-action="scan-speed" data-locked="unpublished" disabled title="Article is not Published — no live URL to test">Scan</button>
+      <span class="health-meta">Scan unavailable — article is not Published, so there is no live URL to test.</span>
+    </div>`;
+  } else {
+    controls = `<div class="health-actions">
+      <button type="button" class="btn-secondary" data-action="scan-speed" ${scanning ? "disabled" : ""}>
+        ${scanning ? "Scanning…" : speed?.scanned ? "Rescan" : "Scan"}
+      </button>
+      <a class="health-meta" href="${escapeAttr(publishedUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(publishedUrl)}</a>
+    </div>
+    <p class="health-speed-status" data-role="speed-status" ${scanning ? "" : "hidden"}>
+      ${scanning ? "Running Google PageSpeed Insights (mobile + desktop). This can take up to a minute…" : ""}
+    </p>`;
+  }
+
+  return `
+    <section class="health-section" data-section="speed">
+      <h3><span class="health-indicator is-${escapeAttr(indicatorStatus)}">${HEALTH_ICONS.speed}</span> Speed</h3>
+      ${renderFindings(speed?.findings)}
+      ${controls}
+      <div data-role="speed-results">${renderSpeedScores(speed)}</div>
+      <p class="health-meta">On-demand only — PageSpeed calls are slow and count against your API quota.</p>
+    </section>`;
+}
 
 const HEALTH_ICONS = {
   links: "🔗",
@@ -823,29 +895,418 @@ function updateHealthBanner() {
   banner.textContent = `${n} article${n === 1 ? "" : "s"} updated this session — remember to commit, push, and deploy.`;
 }
 
-function setHealthBatchProgress(message) {
+/**
+ * @param {string} message
+ * @param {{ active?: boolean, current?: number, total?: number }} [options]
+ */
+function setHealthBatchProgress(message, options = {}) {
   const el = document.getElementById("health-batch-progress");
   if (!el) return;
+  const textEl = el.querySelector(".health-batch-progress-text");
+  const spinnerEl = el.querySelector(".health-batch-spinner");
+  const trackEl = el.querySelector(".health-batch-progress-track");
+  const barEl = el.querySelector(".health-batch-progress-bar");
+
   if (!message) {
     el.hidden = true;
-    el.textContent = "";
+    el.classList.remove("is-active");
+    if (textEl) textEl.textContent = "";
+    if (spinnerEl) spinnerEl.hidden = true;
+    if (trackEl) trackEl.hidden = true;
+    if (barEl) barEl.style.width = "0%";
     return;
   }
+
+  const active = Boolean(options.active);
+  const total = Number(options.total) || 0;
+  const current = Number(options.current) || 0;
+
   el.hidden = false;
-  el.textContent = message;
+  el.classList.toggle("is-active", active);
+  if (textEl) textEl.textContent = message;
+  else el.textContent = message;
+
+  if (spinnerEl) spinnerEl.hidden = !active;
+  if (trackEl) {
+    const showBar = active && total > 0;
+    trackEl.hidden = !showBar;
+    if (showBar && barEl) {
+      const pct = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
+      barEl.style.width = `${pct}%`;
+    }
+  }
 }
 
 function setHealthBatchControlsDisabled(disabled) {
   healthSession.batchRunning = disabled;
   const globalBtn = document.getElementById("health-connect-all");
+  const proposeAllBtn = document.getElementById("health-propose-external-all");
+  const speedAllBtn = document.getElementById("health-speed-check-all");
   const refreshBtn = document.getElementById("health-refresh");
   if (globalBtn) globalBtn.disabled = disabled;
+  if (proposeAllBtn) proposeAllBtn.disabled = disabled;
+  if (speedAllBtn) speedAllBtn.disabled = disabled;
   if (refreshBtn) refreshBtn.disabled = disabled;
   document
-    .querySelectorAll("[data-action='connect-all-internal'], [data-action='connect'], [data-action='propose'], [data-action='add-external']")
+    .querySelectorAll(
+      "[data-action='connect-all-internal'], [data-action='connect'], [data-action='propose'], [data-action='propose-all-external'], [data-action='add-external'], [data-action='scan-speed']"
+    )
     .forEach((btn) => {
+      if (btn.getAttribute("data-locked") === "unpublished") {
+        btn.disabled = true;
+        return;
+      }
       btn.disabled = disabled;
     });
+}
+
+function isSpeedScanEligible(article) {
+  return Boolean(article?.publishedUrl && article?.details?.speed?.canScan);
+}
+
+function updateSpeedCheckAllButton(pagespeedConfigured) {
+  const speedAllBtn = document.getElementById("health-speed-check-all");
+  if (!speedAllBtn || healthSession.batchRunning) return;
+  const eligible = healthSession.articles.filter(isSpeedScanEligible).length;
+  const configured =
+    pagespeedConfigured !== undefined
+      ? pagespeedConfigured
+      : healthSession.articles.some((a) => a.details?.speed?.status !== "unconfigured");
+  speedAllBtn.disabled = !configured || eligible === 0;
+  speedAllBtn.textContent =
+    eligible > 0
+      ? `Speed Check All Articles (${eligible})`
+      : "Speed Check All Articles";
+}
+
+/** Apply a completed PageSpeed result to the in-memory article + visible row immediately. */
+function applySpeedScanToUi(slug, result) {
+  const article = healthSession.articles.find((a) => a.slug === slug);
+  if (article) {
+    article.indicators = article.indicators || {};
+    article.indicators.speed = result.status;
+    article.details = article.details || {};
+    article.details.speed = {
+      ...(article.details.speed || {}),
+      status: result.status,
+      findings: [
+        `Last scan ${String(result.fetchedAt || "").slice(0, 10)} · indicator = ${
+          result.indicatorLabel || "mobile Performance"
+        } (${result.indicatorScore}/100).`,
+      ],
+      publishedUrl: result.url || article.publishedUrl,
+      canScan: true,
+      scanned: true,
+      mobile: result.mobile,
+      desktop: result.desktop,
+      indicatorScore: result.indicatorScore,
+      indicatorLabel: result.indicatorLabel || "mobile Performance",
+      fetchedAt: result.fetchedAt,
+    };
+  }
+
+  const row = document.querySelector(
+    `.health-row[data-slug="${CSS.escape(slug)}"]`
+  );
+  if (!row) return;
+
+  const status = result.status || "gray";
+  row
+    .querySelectorAll(
+      '.health-indicators .health-indicator[title^="Speed"], .health-section[data-section="speed"] .health-indicator'
+    )
+    .forEach((el) => {
+      el.classList.remove(
+        "is-green",
+        "is-orange",
+        "is-red",
+        "is-gray",
+        "is-unconfigured"
+      );
+      el.classList.add(`is-${status}`);
+      el.setAttribute("title", "Speed (mobile Performance)");
+    });
+
+  const resultsEl = row.querySelector("[data-role='speed-results']");
+  if (resultsEl && article?.details?.speed) {
+    resultsEl.innerHTML = renderSpeedScores(article.details.speed);
+  }
+  const scanBtn = row.querySelector("[data-action='scan-speed']:not([data-locked])");
+  if (scanBtn && !healthSession.batchRunning) {
+    scanBtn.disabled = false;
+    scanBtn.textContent = "Rescan";
+  }
+  const statusEl = row.querySelector("[data-role='speed-status']");
+  if (statusEl) {
+    statusEl.hidden = false;
+    statusEl.classList.remove("is-error");
+    statusEl.textContent = `Scan complete · mobile Performance ${result.indicatorScore}/100.`;
+  }
+}
+
+async function scanSpeedForSlug(slug) {
+  return parseJsonResponse(
+    await fetch(`/api/articles/${encodeURIComponent(slug)}/pagespeed`, {
+      method: "POST",
+    })
+  );
+}
+
+async function runGlobalSpeedCheckAll() {
+  if (healthSession.batchRunning) return;
+  const statusEl = document.getElementById("health-status");
+  const data = await refreshArticlesHealth();
+  const all = data.articles || [];
+  const queue = all.filter(isSpeedScanEligible);
+  // Same disabled-state rule as per-article Scan: no live published URL.
+  const skippedNoUrl = all.filter((a) => !a.publishedUrl).length;
+  const skippedUnconfigured = all.filter(
+    (a) => a.publishedUrl && a.details?.speed?.status === "unconfigured"
+  ).length;
+
+  if (!queue.length) {
+    const reason = skippedUnconfigured
+      ? "PageSpeed is not configured (add GOOGLE_PAGESPEED_API_KEY)."
+      : skippedNoUrl
+        ? "No published articles with a live URL to scan."
+        : "No eligible articles to scan.";
+    setHealthBatchProgress(reason, { active: false });
+    return;
+  }
+
+  setHealthBatchControlsDisabled(true);
+  let scanned = 0;
+  let failed = 0;
+  const total = queue.length;
+
+  setHealthBatchProgress(`Preparing speed check for ${total} articles…`, {
+    active: true,
+    current: 0,
+    total,
+  });
+
+  try {
+    for (let i = 0; i < queue.length; i++) {
+      const article = queue[i];
+      const n = i + 1;
+      setHealthBatchProgress(`Scanning ${n} of ${total}: ${article.title}`, {
+        active: true,
+        current: i,
+        total,
+      });
+      healthSession.speedScanning.add(article.slug);
+      const row = document.querySelector(
+        `.health-row[data-slug="${CSS.escape(article.slug)}"]`
+      );
+      const scanBtn = row?.querySelector(
+        "[data-action='scan-speed']:not([data-locked])"
+      );
+      if (scanBtn) {
+        scanBtn.disabled = true;
+        scanBtn.textContent = "Scanning…";
+      }
+      try {
+        const result = await scanSpeedForSlug(article.slug);
+        healthSession.speedScanning.delete(article.slug);
+        applySpeedScanToUi(article.slug, result);
+        scanned += 1;
+      } catch (err) {
+        healthSession.speedScanning.delete(article.slug);
+        failed += 1;
+        if (scanBtn) {
+          scanBtn.disabled = true; // still in batch
+          scanBtn.textContent = article.details?.speed?.scanned ? "Rescan" : "Scan";
+        }
+        const rowStatus = row?.querySelector("[data-role='speed-status']");
+        if (rowStatus) {
+          rowStatus.hidden = false;
+          rowStatus.classList.add("is-error");
+          rowStatus.textContent = err.message || "PageSpeed scan failed.";
+        }
+        setStatus(
+          statusEl,
+          `Speed check error on ${article.slug}: ${err.message}`,
+          true
+        );
+      }
+
+      // Advance the bar as each article finishes (success or failure).
+      setHealthBatchProgress(
+        n < total
+          ? `Scanning ${n} of ${total} complete · next: ${queue[n].title}`
+          : `Scanning ${n} of ${total} complete`,
+        {
+          active: n < total,
+          current: n,
+          total,
+        }
+      );
+    }
+
+    setHealthBatchControlsDisabled(false);
+    await refreshArticlesHealth();
+    const skipPart =
+      skippedNoUrl > 0
+        ? `, ${skippedNoUrl} skipped — no published URL`
+        : "";
+    const failPart =
+      failed > 0 ? `, ${failed} failed` : "";
+    const summary = `Scanned ${scanned} article${scanned === 1 ? "" : "s"}${skipPart}${failPart}.`;
+    setHealthBatchProgress(summary, { active: false, current: total, total });
+    setStatus(statusEl, summary);
+  } catch (err) {
+    setStatus(statusEl, err.message, true);
+    setHealthBatchProgress(`Speed check stopped: ${err.message}`, {
+      active: false,
+    });
+    setHealthBatchControlsDisabled(false);
+    await refreshArticlesHealth().catch(() => {});
+  }
+}
+
+function hideExternalReview() {
+  const panel = document.getElementById("health-external-review");
+  const listPanel = document.getElementById("health-list-panel");
+  if (panel) panel.hidden = true;
+  if (listPanel) listPanel.hidden = false;
+  const reviewList = document.getElementById("health-review-list");
+  if (reviewList) reviewList.innerHTML = "";
+  setStatus(document.getElementById("health-review-status"), "");
+}
+
+function showExternalReview(proposals, contextLabel) {
+  const panel = document.getElementById("health-external-review");
+  const listPanel = document.getElementById("health-list-panel");
+  const reviewList = document.getElementById("health-review-list");
+  const reviewStatus = document.getElementById("health-review-status");
+  if (!panel || !reviewList) return;
+
+  if (!proposals?.length) {
+    hideExternalReview();
+    setHealthBatchProgress(
+      contextLabel
+        ? `${contextLabel}: no on-topic external candidates found.`
+        : "No on-topic external candidates found."
+    );
+    return;
+  }
+
+  reviewList.innerHTML = proposals
+    .map((p) => {
+      const checked = p.preChecked ? "checked" : "";
+      const conf = p.confidence === "high" ? "high" : "borderline";
+      return `<label class="health-review-item is-${conf}">
+        <input type="checkbox" data-review-id="${escapeAttr(p.id)}" data-slug="${escapeAttr(p.articleSlug)}" data-label="${escapeAttr(p.title)}" data-url="${escapeAttr(p.url)}" ${checked} />
+        <span class="health-review-item-body">
+          <a href="${escapeAttr(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.title)}</a>
+          <span class="health-review-item-meta">
+            <span>${escapeHtml(p.articleTitle || p.articleSlug)}</span>
+            <span class="health-confidence is-${conf}">${conf}</span>
+            <span>${escapeHtml(p.source || "")}</span>
+            <span>${escapeHtml(p.url)}</span>
+          </span>
+        </span>
+      </label>`;
+    })
+    .join("");
+
+  panel.hidden = false;
+  if (listPanel) listPanel.hidden = true;
+  setStatus(
+    reviewStatus,
+    `${proposals.length} candidate${proposals.length === 1 ? "" : "s"} ready for review${
+      contextLabel ? ` · ${contextLabel}` : ""
+    }. Unchecked items will be discarded.`
+  );
+  setHealthBatchProgress(
+    `Review ${proposals.length} proposed external link${proposals.length === 1 ? "" : "s"} before writing.`
+  );
+}
+
+async function runProposeAllExternal(slug) {
+  if (healthSession.batchRunning) return;
+  const statusEl = document.getElementById("health-status");
+  setHealthBatchControlsDisabled(true);
+  setHealthBatchProgress(
+    slug
+      ? `Proposing external links for ${slug}...`
+      : "Proposing external links across articles..."
+  );
+  try {
+    const data = await parseJsonResponse(
+      await fetch("/api/articles-health/propose-external", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(slug ? { slug } : {}),
+      })
+    );
+    setHealthBatchControlsDisabled(false);
+    showExternalReview(
+      data.proposals || [],
+      slug
+        ? slug
+        : `${data.articlesNeeding || 0} article${
+            (data.articlesNeeding || 0) === 1 ? "" : "s"
+          } needing sources`
+    );
+  } catch (err) {
+    setStatus(statusEl, err.message, true);
+    setHealthBatchProgress(`Propose stopped: ${err.message}`);
+    setHealthBatchControlsDisabled(false);
+  }
+}
+
+async function runAddSelectedExternal() {
+  const reviewList = document.getElementById("health-review-list");
+  const reviewStatus = document.getElementById("health-review-status");
+  if (!reviewList) return;
+
+  const checked = [...reviewList.querySelectorAll("input[type='checkbox']:checked")];
+  const items = checked.map((input) => ({
+    slug: input.getAttribute("data-slug"),
+    label: input.getAttribute("data-label"),
+    url: input.getAttribute("data-url"),
+  }));
+
+  if (!items.length) {
+    setStatus(reviewStatus, "Select at least one candidate, or Cancel.", true);
+    return;
+  }
+
+  const addBtn = document.getElementById("health-review-add");
+  const cancelBtn = document.getElementById("health-review-cancel");
+  if (addBtn) addBtn.disabled = true;
+  if (cancelBtn) cancelBtn.disabled = true;
+  setHealthBatchProgress(`Writing ${items.length} selected external link${items.length === 1 ? "" : "s"}...`);
+
+  try {
+    const data = await parseJsonResponse(
+      await fetch("/api/articles-health/add-external-selected", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      })
+    );
+    for (const w of data.written || []) {
+      healthSession.updatedSlugs.add(w.slug);
+    }
+    updateHealthBanner();
+    hideExternalReview();
+    setHealthBatchControlsDisabled(false);
+    await refreshArticlesHealth();
+    const written = (data.written || []).length;
+    const skipped = (data.skipped || []).length;
+    setHealthBatchProgress(
+      `Added ${written} external link${written === 1 ? "" : "s"}${
+        skipped ? ` · skipped ${skipped}` : ""
+      }. Unchecked candidates were discarded.`
+    );
+  } catch (err) {
+    setStatus(reviewStatus, err.message, true);
+    setHealthBatchProgress(`Add Selected failed: ${err.message}`);
+    if (addBtn) addBtn.disabled = false;
+    if (cancelBtn) cancelBtn.disabled = false;
+  }
 }
 
 async function connectInternalLink(articleSlug, targetSlug, label) {
@@ -925,15 +1386,20 @@ function renderHealthRow(article) {
   row.className = "health-row";
   row.dataset.slug = article.slug;
 
+  const speedStatus = ind.speed || "gray";
+  const draftBadge = article.draft
+    ? `<span class="health-meta"> · draft</span>`
+    : "";
+
   row.innerHTML = `
     <button type="button" class="health-row-summary" aria-expanded="false">
-      <span class="health-row-title">${escapeHtml(article.title)}</span>
+      <span class="health-row-title">${escapeHtml(article.title)}${draftBadge}</span>
       <span class="health-indicators" aria-label="Health indicators">
         <span class="health-indicator is-${escapeAttr(ind.links || "gray")}" title="Links">${HEALTH_ICONS.links}</span>
         <span class="health-indicator is-${escapeAttr(ind.meta || "gray")}" title="Meta">${HEALTH_ICONS.meta}</span>
         <span class="health-indicator is-${escapeAttr(ind.schema || "gray")}" title="Schema">${HEALTH_ICONS.schema}</span>
         <span class="health-indicator is-${escapeAttr(ind.sitemap || "gray")}" title="Sitemap">${HEALTH_ICONS.sitemap}</span>
-        <span class="health-indicator is-${escapeAttr(ind.speed || "gray")}" title="Speed">${HEALTH_ICONS.speed}</span>
+        <span class="health-indicator is-${escapeAttr(speedStatus)}" title="Speed (mobile Performance)">${HEALTH_ICONS.speed}</span>
       </span>
     </button>
     <div class="health-row-body">
@@ -963,11 +1429,7 @@ function renderHealthRow(article) {
         ${renderFindings(d.sitemap?.findings)}
         <p class="health-meta">Diagnostic only in v1 — no fix action.</p>
       </section>
-      <section class="health-section">
-        <h3><span class="health-indicator is-${escapeAttr(ind.speed || "gray")}">${HEALTH_ICONS.speed}</span> Speed</h3>
-        ${renderFindings(d.speed?.findings)}
-        <p class="health-meta">Diagnostic only — requires GOOGLE_PAGESPEED_API_KEY.</p>
-      </section>
+      ${renderSpeedSection(article, d.speed, speedStatus)}
     </div>
   `;
 
@@ -1006,8 +1468,15 @@ function renderHealthRow(article) {
     proposeBtn.type = "button";
     proposeBtn.className = "btn-secondary";
     proposeBtn.dataset.action = "propose";
-    proposeBtn.textContent = "Propose external sources";
+    proposeBtn.textContent = "Add External Links";
     actions.appendChild(proposeBtn);
+
+    const proposeAllBtn = document.createElement("button");
+    proposeAllBtn.type = "button";
+    proposeAllBtn.className = "btn-secondary";
+    proposeAllBtn.dataset.action = "propose-all-external";
+    proposeAllBtn.textContent = "Propose All External Links";
+    actions.appendChild(proposeAllBtn);
   }
 
   row.addEventListener("click", async (e) => {
@@ -1017,7 +1486,13 @@ function renderHealthRow(article) {
     if (!action) return;
     e.preventDefault();
     e.stopPropagation();
-    if (healthSession.batchRunning && action !== "propose") return;
+    if (
+      healthSession.batchRunning &&
+      action !== "propose" &&
+      action !== "propose-all-external"
+    ) {
+      return;
+    }
 
     const progressEl = row.querySelector("[data-role='connect-progress']");
 
@@ -1029,20 +1504,77 @@ function renderHealthRow(article) {
         );
         proposalsBox.hidden = false;
         if (!data.proposals?.length) {
-          proposalsBox.innerHTML =
-            "<p class=\"health-meta\">No proposals found in body links or cms/data/where-things-stand-sources.json.</p>";
+          const rejected = data.rejectedOffTopic
+            ? ` Filtered out ${data.rejectedOffTopic} off-topic candidate${
+                data.rejectedOffTopic === 1 ? "" : "s"
+              }.`
+            : "";
+          proposalsBox.innerHTML = `<p class="health-meta">No on-topic proposals found in article-specific sources, body links, or cms/data/where-things-stand-sources.json.${rejected}</p>`;
         } else {
           proposalsBox.innerHTML = data.proposals
             .map(
               (p) => `<div class="health-proposal">
                 <a href="${escapeAttr(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.title)}</a>
-                <span class="health-meta">${escapeHtml(p.source)}</span>
+                <span class="health-meta">${escapeHtml(p.source)}${
+                  p.confidence ? ` · ${escapeHtml(p.confidence)}` : ""
+                }</span>
                 <button type="button" class="btn-primary" data-action="add-external" data-url="${escapeAttr(p.url)}" data-label="${escapeAttr(p.title)}">Add</button>
               </div>`
             )
             .join("");
         }
         t.disabled = false;
+        return;
+      }
+
+      if (action === "propose-all-external") {
+        await runProposeAllExternal(article.slug);
+        return;
+      }
+
+      if (action === "scan-speed") {
+        if (!isSpeedScanEligible(article)) {
+          return;
+        }
+        const statusEl = row.querySelector("[data-role='speed-status']");
+        const resultsEl = row.querySelector("[data-role='speed-results']");
+        healthSession.speedScanning.add(article.slug);
+        t.disabled = true;
+        t.textContent = "Scanning…";
+        if (statusEl) {
+          statusEl.hidden = false;
+          statusEl.textContent =
+            "Running Google PageSpeed Insights (mobile + desktop). This can take up to a minute…";
+          statusEl.classList.remove("is-error");
+        }
+        try {
+          const data = await scanSpeedForSlug(article.slug);
+          healthSession.speedScanning.delete(article.slug);
+          applySpeedScanToUi(article.slug, data);
+          await refreshArticlesHealth();
+          // Keep the scanned row expanded after refresh.
+          const refreshed = document.querySelector(
+            `.health-row[data-slug="${CSS.escape(article.slug)}"]`
+          );
+          if (refreshed) {
+            refreshed.classList.add("is-open");
+            refreshed
+              .querySelector(".health-row-summary")
+              ?.setAttribute("aria-expanded", "true");
+          }
+        } catch (err) {
+          healthSession.speedScanning.delete(article.slug);
+          t.disabled = false;
+          t.textContent = article.details?.speed?.scanned ? "Rescan" : "Scan";
+          if (statusEl) {
+            statusEl.hidden = false;
+            statusEl.textContent = err.message || "PageSpeed scan failed.";
+            statusEl.classList.add("is-error");
+          }
+          if (resultsEl && !article.details?.speed?.scanned) {
+            resultsEl.innerHTML = "";
+          }
+        }
         return;
       }
 
@@ -1146,9 +1678,21 @@ async function refreshArticlesHealth() {
         ? `Connect all internal links (${needing} articles)`
         : "Connect all internal links";
   }
+  const proposeAllBtn = document.getElementById("health-propose-external-all");
+  if (proposeAllBtn && !healthSession.batchRunning) {
+    const needingExt = healthSession.articles.filter(
+      (a) => (a.details?.links?.externalCount || 0) < 3
+    ).length;
+    proposeAllBtn.disabled = needingExt === 0;
+    proposeAllBtn.textContent =
+      needingExt > 0
+        ? `Propose All External Links (${needingExt})`
+        : "Propose All External Links";
+  }
+  updateSpeedCheckAllButton(data.pagespeedConfigured);
   setStatus(
     statusEl,
-    `${healthSession.articles.length} published · Links: ${counts.green || 0} healthy, ${counts.orange || 0} needs attention, ${counts.red || 0} critical, ${counts.gray || 0} unclassified`
+    `${healthSession.articles.length} articles · Links: ${counts.green || 0} healthy, ${counts.orange || 0} needs attention, ${counts.red || 0} critical, ${counts.gray || 0} unclassified · Speed unscanned shown gray until Scan`
   );
   updateHealthBanner();
   return data;
@@ -1216,6 +1760,21 @@ async function initArticlesHealth() {
   });
   document.getElementById("health-connect-all")?.addEventListener("click", () => {
     void runGlobalConnectAllInternal();
+  });
+  document
+    .getElementById("health-propose-external-all")
+    ?.addEventListener("click", () => {
+      void runProposeAllExternal();
+    });
+  document.getElementById("health-speed-check-all")?.addEventListener("click", () => {
+    void runGlobalSpeedCheckAll();
+  });
+  document.getElementById("health-review-cancel")?.addEventListener("click", () => {
+    hideExternalReview();
+    setHealthBatchProgress("External-link review cancelled — nothing written.");
+  });
+  document.getElementById("health-review-add")?.addEventListener("click", () => {
+    void runAddSelectedExternal();
   });
   await refreshArticlesHealth();
 }
