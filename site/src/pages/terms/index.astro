@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "../../config/site";
+---
+
+<BaseLayout
+  title={`Terms of Service — ${SITE_NAME}`}
+  description={`Terms of Service for ${SITE_NAME}. Educational content terms for visitors of ${SITE_URL.replace(/^https?:\/\//, "")}.`}
+  canonicalPath="/terms/"
+>
+  <section aria-labelledby="terms-heading" class="section-space">
+    <div class="container-site">
+      <article class="mx-auto max-w-article">
+        <h1 id="terms-heading" class="mb-5">Terms of Service</h1>
+        <p class="mb-8 text-small text-muted">
+          [PLACEHOLDER: Last updated date — replace with the effective date after legal review.]
+        </p>
+        <div class="prose-article">
+          <p>
+            Closing Day Ready provides educational content about the homebuying process
+            for informational purposes. Content on {SITE_URL.replace(/\/$/, "")} is not
+            a substitute for professional legal, financial, lending, or inspection advice.
+          </p>
+          <p>
+            <strong>[PLACEHOLDER: Real terms of service content needed.]</strong>
+            Replace this section with counsel-approved terms covering acceptable use,
+            disclaimers, intellectual property, limitation of liability, and governing
+            law.
+          </p>
+          <h2>Contact</h2>
+          <p>
+            Questions about these terms can be sent to{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

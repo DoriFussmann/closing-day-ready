@@ -1,5 +1,17 @@
 ---
 import { SITE_NAME } from "../config/site";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/about/", label: "About" },
+  { href: "/services/", label: "Services" },
+  { href: "/articles/", label: "Articles" },
+  { href: "/team/", label: "Team" },
+  { href: "/contact/", label: "Contact" },
+  { href: "/privacy/", label: "Privacy Policy" },
+  { href: "/terms/", label: "Terms of Service" },
+  { href: "/rss.xml", label: "RSS" },
+];
 ---
 
 <footer class="mt-auto border-t border-border bg-surface">
@@ -9,38 +21,18 @@ import { SITE_NAME } from "../config/site";
     </p>
     <nav aria-label="Footer">
       <ul class="m-0 flex list-none flex-wrap gap-1 p-0">
-        <li>
-          <a
-            href="/"
-            class="tap-target inline-flex items-center px-3 py-2 text-small text-muted no-underline hover:text-heading hover:no-underline"
-          >
-            Home
-          </a>
-        </li>
-        <li>
-          <a
-            href="/articles/"
-            class="tap-target inline-flex items-center px-3 py-2 text-small text-muted no-underline hover:text-heading hover:no-underline"
-          >
-            Articles
-          </a>
-        </li>
-        <li>
-          <a
-            href="/team/"
-            class="tap-target inline-flex items-center px-3 py-2 text-small text-muted no-underline hover:text-heading hover:no-underline"
-          >
-            Team
-          </a>
-        </li>
-        <li>
-          <a
-            href="/rss.xml"
-            class="tap-target inline-flex items-center px-3 py-2 text-small text-muted no-underline hover:text-heading hover:no-underline"
-          >
-            RSS
-          </a>
-        </li>
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="tap-target inline-flex items-center px-3 py-2 text-small text-muted no-underline hover:text-heading hover:no-underline"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   </div>

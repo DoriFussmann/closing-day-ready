@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME } from "../../config/site";
+
+const services = (await getCollection("services")).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const rendered = await Promise.all(
+  services.map(async (service) => {
+    const { Content } = await render(service);
+    return { service, Content };
+  })
+);
+---
+
+<BaseLayout
+  title={`Services — ${SITE_NAME}`}
+  description="Explore Closing Day Ready’s homebuying guidance and resources — educational guides, checklists, calculators, and practical advice for every step of purchasing a home."
+  canonicalPath="/services/"
+>
+  <section aria-labelledby="services-intro" class="border-b border-border bg-surface">
+    <div class="container-site section-space">
+      <div class="mx-auto max-w-article">
+        <h1 id="services-intro" class="mb-5">Services</h1>
+        <p class="m-0 max-w-2xl text-content text-body">
+          Closing Day Ready provides comprehensive educational content for people buying
+          a home — from understanding mortgages and improving credit to making offers,
+          negotiating contracts, completing inspections, and preparing for closing day.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="services-list-heading" class="section-space">
+    <div class="container-site">
+      <h2 id="services-list-heading" class="sr-only">Our offerings</h2>
+      <ul class="m-0 mx-auto flex max-w-article list-none flex-col gap-8 p-0">
+        {
+          rendered.map(({ service, Content }) => (
+            <li id={service.data.slug}>
+              <article class="card">
+                <h2 class="mb-4 text-h2">{service.data.title}</h2>
+                <p class="mb-6 text-content text-body">{service.data.summary}</p>
+                <div class="prose-article border-t border-border pt-6">
+                  <Content />
+                </div>
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a href="/articles/" class="btn-primary">Browse articles</a>
+                  <a href="/contact/" class="btn-secondary">Contact</a>
+                </div>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

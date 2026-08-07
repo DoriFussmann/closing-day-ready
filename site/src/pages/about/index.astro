@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ImagePlaceholder from "../../components/ImagePlaceholder.astro";
+import { SITE_NAME } from "../../config/site";
+---
+
+<BaseLayout
+  title={`About — ${SITE_NAME}`}
+  description="Closing Day Ready helps homebuyers navigate every step of purchasing a home with clear, practical, and unbiased educational guidance."
+  canonicalPath="/about/"
+>
+  <section aria-labelledby="about-intro" class="border-b border-border bg-surface">
+    <div class="container-site section-space">
+      <div class="mx-auto max-w-article">
+        <h1 id="about-intro" class="mb-5">About Closing Day Ready</h1>
+        <p class="m-0 max-w-2xl text-content text-body">
+          Closing Day Ready is a trusted resource that helps homebuyers navigate every
+          step of the buying process with clear, practical, and unbiased guidance.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="why-heading" class="section-space">
+    <div class="container-site">
+      <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+        <div>
+          <h2 id="why-heading" class="mb-4">Why we exist</h2>
+          <p class="mb-4 text-content text-body">
+            Buying a home asks people to make high-stakes decisions about mortgages,
+            credit, offers, contracts, inspections, and closing — often for the first
+            time, and often under time pressure.
+          </p>
+          <p class="m-0 text-content text-body">
+            Closing Day Ready exists to simplify that journey. The platform delivers
+            comprehensive educational content so buyers can make informed decisions and
+            avoid costly mistakes, whether they are purchasing a first home or another
+            one later in life.
+          </p>
+        </div>
+        <ImagePlaceholder
+          label="[PLACEHOLDER: Warm, authentic photo of a family or couple in a lived-in home — conveys preparation and calm, not luxury staging or handshake tropes]"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="approach-heading" class="border-y border-border bg-surface section-space">
+    <div class="container-site">
+      <div class="mx-auto max-w-article">
+        <h2 id="approach-heading" class="mb-4">Our approach</h2>
+        <p class="mb-8 text-content text-body">
+          We treat homebuying as a learnable process. Instead of promoting products,
+          Closing Day Ready focuses on education before promotion: plain-language
+          explanations, practical checklists and timelines, and resources that answer
+          the questions buyers actually have before, during, and after a purchase.
+        </p>
+        <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-3">
+          <li class="card">
+            <h3 class="mb-3 text-h4">Clarity over complexity</h3>
+            <p class="m-0 text-small text-muted">
+              Break each stage into understandable steps so buyers know what comes next.
+            </p>
+          </li>
+          <li class="card">
+            <h3 class="mb-3 text-h4">Practical guidance</h3>
+            <p class="m-0 text-small text-muted">
+              Guides, checklists, calculators, and timelines built for real decisions.
+            </p>
+          </li>
+          <li class="card">
+            <h3 class="mb-3 text-h4">Calm confidence</h3>
+            <p class="m-0 text-small text-muted">
+              Unbiased explanations that help people feel prepared — not pressured.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="team-teaser-heading" class="section-space">
+    <div class="container-site">
+      <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+        <ImagePlaceholder
+          label="[PLACEHOLDER: Professional team or contributor headshot collage for Closing Day Ready — replace with real approved portraits only]"
+          class="lg:order-1"
+        />
+        <div class="lg:order-2">
+          <h2 id="team-teaser-heading" class="mb-4">Team</h2>
+          <p class="mb-8 text-content text-body">
+            Meet the people behind Closing Day Ready’s educational content. Contributor
+            bios, roles, and credentials live on the Team page so authorship stays clear
+            and up to date.
+          </p>
+          <a href="/team/" class="btn-primary">Meet the team</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

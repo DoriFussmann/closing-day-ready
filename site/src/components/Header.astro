@@ -5,8 +5,11 @@ const pathname = Astro.url.pathname;
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/about/", label: "About" },
+  { href: "/services/", label: "Services" },
   { href: "/articles/", label: "Articles" },
   { href: "/team/", label: "Team" },
+  { href: "/contact/", label: "Contact" },
 ];
 
 function isActive(href: string) {

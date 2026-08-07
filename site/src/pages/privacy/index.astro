@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME, SITE_URL, CONTACT_EMAIL } from "../../config/site";
+---
+
+<BaseLayout
+  title={`Privacy Policy — ${SITE_NAME}`}
+  description={`Privacy Policy for ${SITE_NAME}. How we handle information when you use ${SITE_URL.replace(/^https?:\/\//, "")}.`}
+  canonicalPath="/privacy/"
+>
+  <section aria-labelledby="privacy-heading" class="section-space">
+    <div class="container-site">
+      <article class="mx-auto max-w-article">
+        <h1 id="privacy-heading" class="mb-5">Privacy Policy</h1>
+        <p class="mb-8 text-small text-muted">
+          [PLACEHOLDER: Last updated date — replace with the effective date after legal review.]
+        </p>
+        <div class="prose-article">
+          <p>
+            Closing Day Ready (“we,” “us”) operates {SITE_URL.replace(/\/$/, "")}. This
+            page describes, at a high level, how information may be handled when you use
+            the site.
+          </p>
+          <p>
+            <strong>[PLACEHOLDER: Real privacy policy content needed.]</strong>
+            Replace this section with counsel-approved language covering what data is
+            collected (if any), cookies or analytics, email correspondence to{" "}
+            {CONTACT_EMAIL}, third-party processors, retention, and user rights.
+          </p>
+          <h2>Contact</h2>
+          <p>
+            Privacy questions can be sent to{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

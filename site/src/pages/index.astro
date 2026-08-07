@@ -1,96 +1,321 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ImagePlaceholder from "../components/ImagePlaceholder.astro";
+import FaqAccordion from "../components/FaqAccordion.astro";
 import { SITE_NAME } from "../config/site";
 
 const services = (await getCollection("services")).sort(
   (a, b) => a.data.order - b.data.order
 );
 
-const articles = (await getCollection("articles"))
-  .filter((a) => !a.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
+const alternatingSections = [
+  {
+    title: "Clear guidance for every step of buying a home",
+    body: "Closing Day Ready helps homebuyers navigate mortgages, credit, offers, contracts, inspections, and closing day with practical, unbiased explanations — so you know what happens next before you have to decide.",
+    imageLabel:
+      "[PLACEHOLDER: Documentary-style photo of a couple reviewing mortgage or purchase paperwork at a kitchen table — authentic, not staged handshake or luxury listing]",
+    highlights: [
+      {
+        label: "Mortgages & credit",
+        summary: "Understand pre-approval, rates, and how credit fits the buy.",
+      },
+      {
+        label: "Offers & contracts",
+        summary: "Learn what goes into an offer and how negotiation usually works.",
+      },
+      {
+        label: "Inspections & closing",
+        summary: "Prepare for inspections and the final steps before keys.",
+      },
+    ],
+  },
+  {
+    title: "Practical resources, not sales pitches",
+    body: "Through expert guides, checklists, calculators, timelines, and practical advice, Closing Day Ready answers the questions buyers have before, during, and after purchasing a property — whether it is a first home or a fifth.",
+    imageLabel:
+      "[PLACEHOLDER: Flat, educational still life of a homebuying checklist, timeline notes, and a simple calculator on a clean desk — muted palette, no emoji or cartoon style]",
+    highlights: [
+      {
+        label: "Guides",
+        summary: "Plain-language articles that walk through real buyer decisions.",
+      },
+      {
+        label: "Checklists & timelines",
+        summary: "Structured lists that keep the process organized and calm.",
+      },
+      {
+        label: "Calculators",
+        summary: "Tools that turn abstract numbers into clearer next steps.",
+      },
+    ],
+  },
+  {
+    title: "Education before promotion",
+    body: "Closing Day Ready is a trusted educational resource built for clarity over complexity. The goal is simple: help buyers make informed decisions and avoid costly mistakes — without pressure, hype, or product pushing.",
+    imageLabel:
+      "[PLACEHOLDER: Calm photo of a first-time buyer reading a guide on a laptop in a lived-in home — approachable, daylight, no pointing-at-house stock pose]",
+    highlights: [
+      {
+        label: "Unbiased tone",
+        summary: "Guidance written to inform, not to sell a loan or listing.",
+      },
+      {
+        label: "Accuracy & trust",
+        summary: "Practical detail so you can act with calm confidence.",
+      },
+      {
+        label: "Accessible language",
+        summary: "Complex steps explained the way a patient guide would.",
+      },
+    ],
+  },
+  {
+    title: "From first questions to closing day",
+    body: "The platform simplifies the buying process into a clearer journey: understand financing, evaluate homes with better questions, negotiate with context, complete inspections thoughtfully, and arrive at closing prepared.",
+    imageLabel:
+      "[PLACEHOLDER: Exterior neighborhood or modest home exterior at golden hour — relatable housing, not luxury-only architecture]",
+    highlights: [
+      {
+        label: "Before you buy",
+        summary: "Build readiness around money, credit, and expectations.",
+      },
+      {
+        label: "During the process",
+        summary: "Offers, inspections, and contingencies explained in order.",
+      },
+      {
+        label: "At the finish line",
+        summary: "Closing-day prep so the final steps feel familiar.",
+      },
+    ],
+  },
+];
+
+const faqPlaceholders = [
+  {
+    question: "[PLACEHOLDER: Real FAQ question needed]",
+    answer:
+      "[PLACEHOLDER: Real FAQ answer needed — replace with an accurate Closing Day Ready response.]",
+  },
+  {
+    question: "[PLACEHOLDER: Real FAQ question needed]",
+    answer:
+      "[PLACEHOLDER: Real FAQ answer needed — replace with an accurate Closing Day Ready response.]",
+  },
+  {
+    question: "[PLACEHOLDER: Real FAQ question needed]",
+    answer:
+      "[PLACEHOLDER: Real FAQ answer needed — replace with an accurate Closing Day Ready response.]",
+  },
+  {
+    question: "[PLACEHOLDER: Real FAQ question needed]",
+    answer:
+      "[PLACEHOLDER: Real FAQ answer needed — replace with an accurate Closing Day Ready response.]",
+  },
+];
+
+const heroSlides = [
+  "[PLACEHOLDER: Hero image 1 — homebuyer reviewing a clear checklist or guide at home; calm, documentary feel]",
+  "[PLACEHOLDER: Hero image 2 — inspector or buyer with a clipboard during a residential walkthrough; authentic, not luxury staging]",
+  "[PLACEHOLDER: Hero image 3 — closing-day atmosphere: keys and signed documents on a table in a real home setting]",
+];
 ---
 
 <BaseLayout
-  title={`${SITE_NAME} — Home`}
+  title={`${SITE_NAME} — Homebuying guidance you can trust`}
   description="Closing Day Ready is a trusted resource that helps homebuyers navigate every step of the buying process with clear, practical, and unbiased guidance."
   canonicalPath="/"
 >
-  {/* Hero */}
+  {/* 1. Hero */}
   <section aria-labelledby="home-intro" class="border-b border-border bg-surface">
     <div class="container-site section-space">
-      <div class="mx-auto max-w-article">
-        <h1 id="home-intro" class="mb-5">{SITE_NAME}</h1>
-        <p class="mb-8 max-w-2xl text-content text-body">
-          Closing Day Ready is a trusted resource that helps homebuyers navigate every
-          step of the buying process with clear, practical, and unbiased guidance.
-        </p>
-        <a href="/articles/" class="btn-primary">Browse articles</a>
+      <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+        <div>
+          <h1 id="home-intro" class="mb-5">
+            Clear guidance for every step of buying a home
+          </h1>
+          <p class="mb-8 max-w-xl text-content text-body">
+            Closing Day Ready is a trusted resource that helps homebuyers navigate every
+            step of the buying process with clear, practical, and unbiased guidance.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="/about/" class="btn-primary">About Closing Day Ready</a>
+            <a href="/services/" class="btn-secondary">Explore our resources</a>
+          </div>
+        </div>
+
+        <div class="hero-cycle" data-hero-cycle>
+          <div class="relative">
+            {
+              heroSlides.map((label, index) => (
+                <div
+                  class:list={[index === 0 ? "block" : "hidden"]}
+                  data-hero-panel
+                  hidden={index !== 0 ? true : undefined}
+                >
+                  <ImagePlaceholder label={label} aspect="hero" />
+                </div>
+              ))
+            }
+          </div>
+          <div class="mt-4 flex items-center justify-center gap-2" role="tablist" aria-label="Hero image slides">
+            {
+              heroSlides.map((_, index) => (
+                <button
+                  type="button"
+                  class="tap-target inline-flex h-11 w-11 items-center justify-center"
+                  data-hero-dot
+                  aria-label={`Show hero image ${index + 1}`}
+                  aria-current={index === 0 ? "true" : undefined}
+                >
+                  <span
+                    class:list={[
+                      "h-2.5 w-2.5 rounded-full border border-border",
+                      index === 0 ? "bg-accent border-accent" : "bg-white",
+                    ]}
+                    data-hero-dot-inner
+                  />
+                </button>
+              ))
+            }
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  {/* Latest Guides — ordered ahead of Buying Journey per §10 homepageSections */}
-  <section aria-labelledby="latest-articles-heading" class="section-space">
+  {/* 2. Trust — skipped: no partner names, press mentions, or credible stats in Company Data */}
+
+  {/* 3. Alternating sections */}
+  {
+    alternatingSections.map((section, index) => {
+      const imageFirst = index % 2 === 1;
+      return (
+        <section
+          aria-labelledby={`alt-heading-${index}`}
+          class:list={[
+            "section-space",
+            index % 2 === 0 ? "bg-background" : "border-y border-border bg-surface",
+          ]}
+        >
+          <div class="container-site">
+            <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+              <div class:list={[imageFirst ? "lg:order-2" : ""]}>
+                <h2 id={`alt-heading-${index}`} class="mb-4">
+                  {section.title}
+                </h2>
+                <p class="mb-8 max-w-xl text-content text-body">{section.body}</p>
+                <ul class="m-0 grid list-none gap-3 p-0 sm:grid-cols-3">
+                  {section.highlights.map((item) => (
+                    <li class="rounded-card border border-border bg-white p-4">
+                      <p class="mb-2 text-small font-normal text-heading">{item.label}</p>
+                      <p class="m-0 text-small text-muted">{item.summary}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div class:list={[imageFirst ? "lg:order-1" : ""]}>
+                <ImagePlaceholder label={section.imageLabel} />
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    })
+  }
+
+  {/* 4. Offering / services */}
+  <section aria-labelledby="offering-heading" class="border-t border-border bg-surface section-space">
     <div class="container-site">
-      <h2 id="latest-articles-heading" class="mb-8">Latest Articles</h2>
-      <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mx-auto mb-10 max-w-article text-center">
+        <h2 id="offering-heading" class="mb-4">Homebuying guidance & resources</h2>
+        <p class="m-0 text-content text-body">
+          Closing Day Ready focuses on one offering: educational resources that help
+          buyers understand the full purchase journey and move forward with confidence.
+        </p>
+      </div>
+      <ul class="m-0 mx-auto flex max-w-2xl list-none flex-col gap-4 p-0">
         {
-          articles.map((article) => (
+          services.map((service) => (
             <li>
-              <a
-                href={`/articles/${article.data.slug}/`}
-                class="card group flex h-full flex-col no-underline transition-colors hover:border-accent/40 hover:no-underline"
-              >
-                <span class="mb-3 block text-h4 font-light text-heading group-hover:text-accent">
-                  {article.data.title}
-                </span>
-                <p class="m-0 flex-1 text-small text-muted">{article.data.description}</p>
-              </a>
+              <article class="card">
+                <h3 class="mb-3 text-h3">{service.data.title}</h3>
+                <p class="mb-6 text-content text-body">{service.data.summary}</p>
+                <div class="flex flex-wrap gap-3">
+                  <a href="/services/" class="btn-primary">Learn more</a>
+                  <a href="/contact/" class="btn-secondary">Contact us</a>
+                </div>
+              </article>
             </li>
           ))
         }
       </ul>
-      <p class="mt-8">
-        <a href="/articles/" class="btn-secondary">View all articles</a>
-      </p>
     </div>
   </section>
 
-  {/* Buying Journey — services scroll section from infra build */}
-  <section aria-labelledby="services-heading" class="border-t border-border bg-surface section-space">
+  {/* 5. Testimonials — skipped (not in page checklist) */}
+
+  {/* 6. FAQ */}
+  <section aria-labelledby="faq-cta-heading" class="section-space">
     <div class="container-site">
-      <h2 id="services-heading" class="mb-8">Services</h2>
-      <ul class="m-0 flex list-none gap-4 overflow-x-auto p-0 pb-2 snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
-        {
-          services.map((service) => (
-            <li class="min-w-[min(100%,20rem)] shrink-0 snap-start md:min-w-0">
-              <div class="card h-full">
-                <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-btn border border-border bg-background text-accent">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5z"></path>
-                  </svg>
-                </div>
-                <h3 class="mb-3 text-h4">{service.data.title}</h3>
-                <p class="m-0 text-small text-muted">{service.data.summary}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="grid gap-10 lg:grid-cols-2 lg:gap-14">
+        <div>
+          <h2 id="faq-cta-heading" class="mb-4">Have questions?</h2>
+          <p class="mb-8 max-w-md text-content text-body">
+            If you need help finding the right guide or want to share a topic that should
+            be covered next, reach out — Closing Day Ready is here to make the process
+            clearer.
+          </p>
+          <a href="/contact/" class="btn-primary">Contact</a>
+        </div>
+        <div>
+          <FaqAccordion faqs={faqPlaceholders} />
+        </div>
+      </div>
     </div>
   </section>
+
+  <script>
+    const root = document.querySelector("[data-hero-cycle]");
+    if (root) {
+      const panels = Array.from(root.querySelectorAll("[data-hero-panel]"));
+      const buttons = Array.from(root.querySelectorAll("[data-hero-dot]"));
+      const dots = Array.from(root.querySelectorAll("[data-hero-dot-inner]"));
+      let current = 0;
+      let timer;
+
+      function show(index) {
+        current = index;
+        panels.forEach((panel, i) => {
+          const active = i === index;
+          panel.classList.toggle("hidden", !active);
+          panel.classList.toggle("block", active);
+          if (active) panel.removeAttribute("hidden");
+          else panel.setAttribute("hidden", "");
+        });
+        buttons.forEach((button, i) => {
+          if (i === index) button.setAttribute("aria-current", "true");
+          else button.removeAttribute("aria-current");
+        });
+        dots.forEach((dot, i) => {
+          const active = i === index;
+          dot.classList.toggle("bg-accent", active);
+          dot.classList.toggle("border-accent", active);
+          dot.classList.toggle("bg-white", !active);
+        });
+      }
+
+      buttons.forEach((button, index) => {
+        button.addEventListener("click", () => {
+          show(index);
+          window.clearInterval(timer);
+        });
+      });
+
+      timer = window.setInterval(() => {
+        show((current + 1) % panels.length);
+      }, 5000);
+    }
+  </script>
 </BaseLayout>

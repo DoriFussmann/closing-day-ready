@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_NAME, CONTACT_EMAIL } from "../../config/site";
+
+const mailto = `mailto:${CONTACT_EMAIL}`;
+---
+
+<BaseLayout
+  title={`Contact — ${SITE_NAME}`}
+  description={`Contact ${SITE_NAME} for questions about homebuying guidance, article topics, or partnership inquiries.`}
+  canonicalPath="/contact/"
+>
+  <section aria-labelledby="contact-heading" class="section-space">
+    <div class="container-site">
+      <div class="mx-auto max-w-article">
+        <h1 id="contact-heading" class="mb-5">Contact</h1>
+        <p class="mb-8 text-content text-body">
+          Have a question about the homebuying process, a topic we should cover, or
+          feedback on Closing Day Ready’s guides? Reach out by email — we read every
+          message.
+        </p>
+
+        <div class="card mb-10">
+          <h2 class="mb-3 text-h3">Email</h2>
+          <p class="mb-6 text-content text-body">
+            <a href={mailto} class="font-normal text-accent break-all">{CONTACT_EMAIL}</a>
+          </p>
+          <a href={mailto} class="btn-primary">Send an email</a>
+        </div>
+
+        <aside class="rounded-card border border-border bg-surface p-6 md:p-8" aria-label="Contact form note">
+          <h2 class="mb-3 text-h4">Contact form (decision needed)</h2>
+          <p class="m-0 text-small text-muted">
+            A static Astro site needs a third-party form handler (for example Formspree
+            or Netlify Forms) before an on-page contact form can submit reliably. Until
+            that service is chosen and configured, this page uses a simple mailto link
+            so visitors can still reach Closing Day Ready without guessing a backend.
+          </p>
+        </aside>
+
+        <p class="mt-10 mb-0 text-content text-body">
+          Looking for educational resources first?
+          <a href="/services/">See our homebuying guidance</a>
+          or
+          <a href="/articles/">browse articles</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
