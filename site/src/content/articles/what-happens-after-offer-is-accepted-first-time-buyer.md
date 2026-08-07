@@ -36,6 +36,22 @@ faqs:
     answer: A Closing Disclosure is the final, legally binding document that itemizes all your loan terms, closing costs, and cash-to-close amount. Federal law (TRID regulations) requires your lender to deliver it at least three business days before you sign. This waiting period is mandatory—no lender can waive it—so factor it into your expected closing date from the start.
   - question: What should I look for during the final walkthrough?
     answer: "The final walkthrough, typically 24–48 hours before closing, is your last check that the property is in the condition you agreed to buy it in. Look for: all negotiated repairs completed; fixtures, appliances, and systems (HVAC, water heater) present and working; no new damage from the seller moving out; and that nothing included in the sale has been removed. If something is wrong, you have the right to delay closing or negotiate a credit before signing."
+internalLinks:
+  - label: "First-Time Buyer Hub: Your Complete Guide to Buying a Home"
+    url: /articles/first-time-home-buyer/
+  - label: "First-Time Homebuyer Timeline Checklist: Phase-by-Phase Plan"
+    url: /articles/first-time-homebuyer-timeline-checklist/
+  - label: "How Long to Save a Down Payment: First-Time Buyer Guide"
+    url: /articles/how-long-does-it-take-to-save-for-a-down-payment-first-time-buyer/
+  - label: "Timeline for Buying Your First Home: A Phase-by-Phase Guide"
+    url: /articles/timeline-for-buying-your-first-home/
+externalLinks:
+  - label: What Happens After A Home Offer Is Accepted - Articles
+    url: https://www.consumerscu.org/blog/what-happens-after-a-home-offer-is-accepted
+  - label: What Happens After You Make an Offer on a House? 7 ...
+    url: https://www.fairway.com/articles/what-happens-after-you-make-an-offer-on-a-house-7-steps-before-you-get-to-closing
+  - label: Steps to Buying a Home | CA Housing Finance Agency - CalHFA
+    url: https://www.calhfa.ca.gov/homebuyer/index.htm
 ---
 
 Congratulations—your offer was accepted. Take a breath, then get moving, because the clock just started. From the moment a seller signs your purchase contract, you are inside a 30–45-day window during which inspections must be scheduled, a mortgage must be formally underwritten, title work must be cleared, and a mountain of paperwork must be signed. 
@@ -165,3 +181,7 @@ Contract cancellations inched down this spring as homebuyers and sellers gained 
 A Redfin report found that just over 47,000 U.S. home-sale agreements were canceled in April, representing 13.4% of homes that went under contract during the month—down slightly from March, signaling some stabilization after the record cancellation rates seen in late 2025 and early 2026.
  For first-time buyers, the practical takeaway from this environment is straightforward: deals are surviving at higher rates when both parties communicate clearly and move quickly through the inspection, appraisal, and underwriting stages, making the week-by-week discipline described in this guide more valuable than ever.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

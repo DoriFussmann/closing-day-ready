@@ -37,6 +37,22 @@ faqs:
     answer: Down payment assistance (DPA) programs — run by state housing finance agencies, counties, cities, and nonprofits — provide grants, forgivable loans, or deferred second mortgages to help cover your down payment and sometimes closing costs. As of late 2025, more than 2,600 active programs exist nationwide, with average benefits around $18,000. Eligibility typically requires first-time buyer status (which includes anyone who hasn't owned a primary residence in the last three years), income limits, and completion of a homebuyer education course. Start with your state's Housing Finance Agency website or ask a lender who specializes in first-time buyer programs.
   - question: Does improving my credit score really shorten the down payment timeline?
     answer: Indirectly, yes — and in a meaningful way. A higher credit score doesn't reduce the dollar amount you need to save, but it qualifies you for a lower interest rate at pre-approval, which lowers your projected monthly payment. A lower payment means you can qualify for a slightly smaller down payment in some scenarios, and it changes your long-term cost calculus. More practically, a stronger credit profile opens access to better loan programs and can make the difference between qualifying for a 3% conventional loan versus being steered toward a higher-cost alternative.
+internalLinks:
+  - label: "First-Time Buyer Hub: Your Complete Guide to Buying a Home"
+    url: /articles/first-time-home-buyer/
+  - label: "First-Time Homebuyer Timeline Checklist: Phase-by-Phase Plan"
+    url: /articles/first-time-homebuyer-timeline-checklist/
+  - label: "Timeline for Buying Your First Home: A Phase-by-Phase Guide"
+    url: /articles/timeline-for-buying-your-first-home/
+  - label: "Offer Accepted: Your First-Timer's 30–45-Day Closing Plan"
+    url: /articles/what-happens-after-offer-is-accepted-first-time-buyer/
+externalLinks:
+  - label: 15 Smart Ways to Save for a House in 2026
+    url: https://www.amerisave.com/learn/smart-ways-to-save-for-a-house-in-your-complete-down-payment-guide
+  - label: How Long Does It Really Take to Save For a Down Payment?
+    url: https://downpaymentresource.com/homebuyer-resource/how-long-does-it-really-take-to-save-for-a-down-payment/
+  - label: House hunting? These are the metros where first-time ...
+    url: https://www.facebook.com/yahoofinance/posts/house-hunting-these-are-the-metros-where-first-time-buyers-can-fast-track-their-/1385553423439432/
 ---
 
 # How Long to Save a Down Payment: First-Time Buyer Guide
@@ -157,3 +173,7 @@ If you're at the beginning of this process, one of the highest-value steps you c
 <!-- WHERE-THINGS-STAND:START -->
 Recent data and reporting from mid-2026 paint a picture of widening geographic divergence and underused assistance resources. A Rocket Mortgage analysis published in late June found the savings timeline for first-time buyers ranges from under four years in several Midwest metros to an effectively unreachable 65 years in New York City, underscoring how misleading national averages remain for local planning. Separately, a July 2026 analysis by Urban Institute and Down Payment Resource found that while nearly 80% of FHA purchase loans in the 10 largest metro areas were potentially eligible for down payment assistance, only about 17% of FHA borrowers actually used government-sourced help — a significant gap that recent reporting describes as one of the most persistent inefficiencies in the first-time buyer pipeline. The ICE Mortgage Monitor for July 2026 adds another signal: nearly three in ten homebuyers are now using funding sources other than personal savings to cover their down payment, the highest share in seven years, reflecting a broader shift toward gift funds, assistance programs, and alternative pathways as the traditional solo-savings route grows longer.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

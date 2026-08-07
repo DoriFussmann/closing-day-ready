@@ -422,7 +422,7 @@ app.get(
   "/api/articles/:slug/propose-external",
   asyncHandler(async (req, res) => {
     try {
-      const result = proposeExternalLinks(req.params.slug);
+      const result = await proposeExternalLinks(req.params.slug);
       res.json({ ok: true, ...result });
     } catch (err) {
       return jsonError(
@@ -439,7 +439,7 @@ app.post(
   asyncHandler(async (req, res) => {
     try {
       const slug = req.body?.slug ? String(req.body.slug).trim() : undefined;
-      const result = proposeAllExternalLinks(slug ? { slug } : undefined);
+      const result = await proposeAllExternalLinks(slug ? { slug } : undefined);
       res.json({ ok: true, ...result });
     } catch (err) {
       return jsonError(

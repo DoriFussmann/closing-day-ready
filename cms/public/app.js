@@ -1510,7 +1510,15 @@ function renderHealthRow(article) {
                 data.rejectedOffTopic === 1 ? "" : "s"
               }.`
             : "";
-          proposalsBox.innerHTML = `<p class="health-meta">No on-topic proposals found in article-specific sources, body links, or cms/data/where-things-stand-sources.json.${rejected}</p>`;
+          const searchNote = data.searchUsed
+            ? data.searchQuery
+              ? ` Live search ran for “${escapeHtml(data.searchQuery)}”.`
+              : " Live search ran."
+            : "";
+          const searchErr = data.searchError
+            ? ` ${escapeHtml(data.searchError)}`
+            : "";
+          proposalsBox.innerHTML = `<p class="health-meta">No on-topic proposals found in article-specific sources, body links, where-things-stand-sources.json, or live search.${rejected}${searchNote}${searchErr}</p>`;
         } else {
           proposalsBox.innerHTML = data.proposals
             .map(

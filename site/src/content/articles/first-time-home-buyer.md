@@ -34,6 +34,16 @@ faqs:
     answer: Possibly, yes. Most federal loan programs and state assistance programs define a first-time homebuyer as anyone who has not held an ownership interest in a primary residence during the previous three years. Some programs also extend eligibility to displaced homemakers and single parents who previously co-owned only with a spouse. Always check with the specific program you're pursuing.
   - question: Do I need a 20% down payment to buy a house?
     answer: No. While a 20% down payment eliminates private mortgage insurance (PMI), many first-time buyers put down far less. FHA loans require as little as 3.5% down, conventional programs like HomeReady and Home Possible allow 3% down, and VA and USDA loans offer 0% down payment options for qualified buyers. Down payment assistance programs at the state and local level can close the gap further.
+internalLinks:
+  - label: "Timeline for Buying Your First Home: A Phase-by-Phase Guide"
+    url: /articles/timeline-for-buying-your-first-home/
+externalLinks:
+  - label: The Complete First-Time Homebuyer Guide
+    url: https://www.ahs.com/home-matters/homebuyer-hub-resources-and-guides/the-complete-first-time-homebuyer-guide/
+  - label: Home buying assistance
+    url: https://www.usa.gov/buying-home-programs
+  - label: First-Time Home Buyers
+    url: https://www.nerdwallet.com/mortgages/hubs/first-time-homebuyers
 ---
 
 # First-Time Buyer Hub: Your Complete Guide to Buying a Home
@@ -257,3 +267,7 @@ You've just mapped the full arc of the home-buying journey — from the personal
 A real estate agent works in your interest most effectively when you can articulate exactly what you need — not just a neighborhood preference, but your non-negotiables, your contingency strategy, and your walk-away price. A loan officer gives you better options when you arrive having already reviewed your credit, understood your DTI, and researched which programs your situation might qualify for. An inspector's report is most useful when you know how to read it rather than just reacting to the summary.
 
 But knowing the process is not the same as having a trusted advocate beside you through it. The loan officers and agents you'll work with have professional interests that don't always align perfectly with yours — not out of bad faith, but because of how they're compensated. What most first-time buyers lack, and what makes the biggest practical difference, is access to someone who can help them evaluate financing options, interpret inspection findings, and assess whether an offer price reflects what a home is actually worth — without any stake in the transaction itself. That's the kind of guidance Closing Day Ready exists to provide: clear, buyer-aligned expertise at every stage, so that closing day feels like a well-earned arrival rather than a relieved escape.
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

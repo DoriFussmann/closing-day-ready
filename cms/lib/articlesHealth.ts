@@ -8,6 +8,11 @@ import {
 } from "./writeArticle.js";
 import { SITE_URL } from "./siteConfig.js";
 import { getCachedPageSpeed } from "./pageSpeed.js";
+import {
+  buildExternalLinkSearchQuery,
+  isWebSearchConfigured,
+  searchWeb,
+} from "./webSearch.js";
 import YAML from "yaml";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -800,8 +805,9 @@ function collectCandidatePool(
 ): SourceCandidate[] {
   const { primary, fallback } = loadWtsPools(slug);
   const bodyLinks = extractBodyExternalLinks(body);
-  // Primary (article-specific WTS) first, then fresh search = global WTS + body.
-  const ordered = [...primary, ...fallback, ...bodyLinks];
+  // Known sources first: article-specific WTS → body links → global WTS.
+  // Live web search is a separate final fallback (see proposeExternalLinks).
+  const ordered = [...primary, ...bodyLinks, ...fallback];
   const seen = new Set<string>();
   const out: SourceCandidate[] = [];
   for (const c of ordered) {
@@ -811,6 +817,75 @@ function collectCandidatePool(
     out.push(c);
   }
   return out;
+}
+
+function countRejectedOffTopic(
+  pool: SourceCandidate[],
+  targetKeyword: string | undefined,
+  pillarKeyword: string | undefined,
+  existingUrls: Set<string>
+): number {
+  let rejected = 0;
+  for (const candidate of pool) {
+    if (existingUrls.has(urlKey(candidate.url))) continue;
+    if (
+      scoreTopicRelevance(candidate, targetKeyword, pillarKeyword) === "reject"
+    ) {
+      rejected += 1;
+    }
+  }
+  return rejected;
+}
+
+async function liveSearchCandidates(
+  targetKeyword: string | undefined,
+  pillarKeyword: string | undefined
+): Promise<{
+  candidates: SourceCandidate[];
+  searchQuery: string | null;
+  searchUsed: boolean;
+  searchError: string | null;
+}> {
+  const searchQuery = buildExternalLinkSearchQuery(targetKeyword, pillarKeyword);
+  if (!searchQuery) {
+    return {
+      candidates: [],
+      searchQuery: null,
+      searchUsed: false,
+      searchError: "Missing targetKeyword/pillarKeyword for live search",
+    };
+  }
+  if (!isWebSearchConfigured()) {
+    return {
+      candidates: [],
+      searchQuery,
+      searchUsed: false,
+      searchError:
+        "DATAFORSEO_LOGIN/PASSWORD not configured. Add them to cms/.env.local for live external-link search.",
+    };
+  }
+
+  const response = await searchWeb(searchQuery, 10);
+  if (!response.available) {
+    return {
+      candidates: [],
+      searchQuery,
+      searchUsed: true,
+      searchError: response.reason || "Live search failed",
+    };
+  }
+
+  return {
+    candidates: response.results.map((hit) => ({
+      title: hit.title,
+      url: hit.url,
+      note: hit.note,
+      source: "liveSearch",
+    })),
+    searchQuery,
+    searchUsed: true,
+    searchError: null,
+  };
 }
 
 function filterRelevantCandidates(
@@ -855,16 +930,24 @@ function articleTopicFields(frontmatter: Record<string, unknown>): {
   };
 }
 
-/**
- * Per-article Propose / Add External Links candidates.
- * Filters by topic before any candidate is returned for display.
- */
-export function proposeExternalLinks(slug: string): {
+export type ProposeExternalLinksResult = {
   proposals: Array<SourceCandidate & { confidence: "high" | "borderline" }>;
   externalCount: number;
   slotsNeeded: number;
   rejectedOffTopic: number;
-} {
+  searchQuery: string | null;
+  searchUsed: boolean;
+  searchError: string | null;
+};
+
+/**
+ * Per-article Propose / Add External Links candidates.
+ * Filters by topic before any candidate is returned for display.
+ * Falls back to DataForSEO live SERP when static pools have no on-topic hits.
+ */
+export async function proposeExternalLinks(
+  slug: string
+): Promise<ProposeExternalLinksResult> {
   const article = readArticleFile(slug);
   if (!article) throw new Error(`Article not found: ${slug}`);
   const existing = asLinks(article.frontmatter.externalLinks);
@@ -874,22 +957,43 @@ export function proposeExternalLinks(slug: string): {
   );
 
   const pool = collectCandidatePool(slug, article.body);
-  let rejectedOffTopic = 0;
-  for (const candidate of pool) {
-    if (existingUrls.has(urlKey(candidate.url))) continue;
-    if (
-      scoreTopicRelevance(candidate, targetKeyword, pillarKeyword) === "reject"
-    ) {
-      rejectedOffTopic += 1;
-    }
-  }
-
-  const relevant = filterRelevantCandidates(
+  let rejectedOffTopic = countRejectedOffTopic(
     pool,
     targetKeyword,
     pillarKeyword,
     existingUrls
   );
+
+  let relevant = filterRelevantCandidates(
+    pool,
+    targetKeyword,
+    pillarKeyword,
+    existingUrls
+  );
+
+  let searchQuery: string | null = null;
+  let searchUsed = false;
+  let searchError: string | null = null;
+
+  if (relevant.length === 0) {
+    const live = await liveSearchCandidates(targetKeyword, pillarKeyword);
+    searchQuery = live.searchQuery;
+    searchUsed = live.searchUsed;
+    searchError = live.searchError;
+    rejectedOffTopic += countRejectedOffTopic(
+      live.candidates,
+      targetKeyword,
+      pillarKeyword,
+      existingUrls
+    );
+    relevant = filterRelevantCandidates(
+      live.candidates,
+      targetKeyword,
+      pillarKeyword,
+      existingUrls
+    );
+  }
+
   const slotsNeeded = Math.max(0, 3 - existing.length);
   const proposals = relevant.slice(0, Math.max(slotsNeeded, 3));
 
@@ -898,6 +1002,9 @@ export function proposeExternalLinks(slug: string): {
     externalCount: existing.length,
     slotsNeeded,
     rejectedOffTopic,
+    searchQuery,
+    searchUsed,
+    searchError,
   };
 }
 
@@ -905,13 +1012,14 @@ export function proposeExternalLinks(slug: string): {
  * Batch propose for one article or all published articles needing external links.
  * Does not write — caller must review then add selected.
  */
-export function proposeAllExternalLinks(options?: {
+export async function proposeAllExternalLinks(options?: {
   slug?: string;
-}): {
+}): Promise<{
   proposals: ProposedExternalLink[];
   articlesScanned: number;
   articlesNeeding: number;
-} {
+  searchErrors: Array<{ slug: string; error: string }>;
+}> {
   const all = published(loadAllArticles());
   const targetSlugs = options?.slug
     ? all.filter((a) => a.slug === options.slug)
@@ -922,6 +1030,7 @@ export function proposeAllExternalLinks(options?: {
   }
 
   const proposals: ProposedExternalLink[] = [];
+  const searchErrors: Array<{ slug: string; error: string }> = [];
   let articlesNeeding = 0;
 
   for (const article of targetSlugs) {
@@ -930,18 +1039,31 @@ export function proposeAllExternalLinks(options?: {
     articlesNeeding += 1;
 
     const existingUrls = new Set(article.externalLinks.map((l) => urlKey(l.url)));
-    // Also exclude URLs already proposed in this batch for other articles? No —
-    // same source can be valid for multiple articles if on-topic.
     const pool = collectCandidatePool(article.slug, article.body);
-    const relevant = filterRelevantCandidates(
+    let relevant = filterRelevantCandidates(
       pool,
       article.targetKeyword,
       article.pillarKeyword,
       existingUrls
     );
 
-    // One candidate per missing slot (best remaining), plus keep extras? Spec:
-    // "for every missing external link slot" — emit one proposal per slot.
+    if (relevant.length === 0) {
+      const live = await liveSearchCandidates(
+        article.targetKeyword,
+        article.pillarKeyword
+      );
+      if (live.searchError) {
+        searchErrors.push({ slug: article.slug, error: live.searchError });
+      }
+      relevant = filterRelevantCandidates(
+        live.candidates,
+        article.targetKeyword,
+        article.pillarKeyword,
+        existingUrls
+      );
+    }
+
+    // One candidate per missing slot (best remaining).
     const forSlots = relevant.slice(0, slotsNeeded);
     for (let i = 0; i < forSlots.length; i++) {
       const c = forSlots[i];
@@ -963,6 +1085,7 @@ export function proposeAllExternalLinks(options?: {
     proposals,
     articlesScanned: targetSlugs.length,
     articlesNeeding,
+    searchErrors,
   };
 }
 

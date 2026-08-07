@@ -50,6 +50,8 @@ externalLinks:
     url: https://www.consumerfinance.gov/owning-a-home/
   - label: CFPB — What is a mortgage pre-approval?
     url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: How Long Does a Preapproval for a Mortgage Take?
+    url: https://www.sofi.com/learn/content/how-long-does-a-preapproval-for-mortgage-take/
 ---
 
 ## How Long Does Mortgage Pre-Approval Take? Your Timeline

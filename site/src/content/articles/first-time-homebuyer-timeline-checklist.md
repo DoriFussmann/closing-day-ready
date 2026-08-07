@@ -36,6 +36,22 @@ faqs:
     answer: No. Nearly all closing attorneys and title companies require certified funds—either a wire transfer or a cashier's check—for amounts above a small threshold. Wiring funds one to two business days before closing is the safest approach. Personal checks are routinely rejected at the table, and scrambling to fix this on closing day can delay your disbursement by 24 hours or more.
   - question: What happens if I miss the inspection contingency deadline?
     answer: Missing a contract-mandated deadline—like the window to complete your inspection and submit any repair requests—can mean the contingency automatically expires. That could leave you with no leverage to negotiate repairs and, in some cases, no legal right to exit the contract without forfeiting your earnest money. This is one of the deadlines that must be tracked from the moment your offer is accepted.
+internalLinks:
+  - label: "First-Time Buyer Hub: Your Complete Guide to Buying a Home"
+    url: /articles/first-time-home-buyer/
+  - label: "How Long to Save a Down Payment: First-Time Buyer Guide"
+    url: /articles/how-long-does-it-take-to-save-for-a-down-payment-first-time-buyer/
+  - label: "Timeline for Buying Your First Home: A Phase-by-Phase Guide"
+    url: /articles/timeline-for-buying-your-first-home/
+  - label: "Offer Accepted: Your First-Timer's 30–45-Day Closing Plan"
+    url: /articles/what-happens-after-offer-is-accepted-first-time-buyer/
+externalLinks:
+  - label: First time home buyer mortgage help
+    url: https://www.hsh.com/first-time-homebuyer/
+  - label: The Complete First-Time Homebuyer Guide
+    url: https://www.ahs.com/home-matters/homebuyer-hub-resources-and-guides/the-complete-first-time-homebuyer-guide/
+  - label: First-time homebuyer checklist and preparation tips
+    url: https://www.facebook.com/groups/fthomebuyers/posts/1718144168764050/
 ---
 
 # First-Time Homebuyer Timeline Checklist: Phase-by-Phase Plan
@@ -171,3 +187,7 @@ A checklist is a remarkable tool for preventing errors of omission—the things 
 That's the gap between having a plan and executing one successfully. First-time buyers who pair a structured checklist with access to genuinely knowledgeable guidance—someone who can interpret what's happening, not just confirm that the step exists—are the ones who catch developing problems before they become contract-breaking delays. The checklist tells you when to act. A knowledgeable guide tells you what you're actually looking at when you do.
 
 Use this as your phase-by-phase execution roadmap. Revisit it at every transition. And when something on the list isn't going the way the description says it should, that's the moment to ask—not after the contingency window closes.
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.
