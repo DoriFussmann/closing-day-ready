@@ -18,11 +18,15 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - home inspection report
   - home inspection checklist
   - Home Inspection
+pillarKeyword: Home Inspection
+supportingKeyword: home inspection checklist
+articleType: howto
+targetKeyword: home inspection report
 faqs:
   - question: What should I do if I don't understand the severity codes in my inspection report?
     answer: Call your inspector before you do anything else. Most inspectors are happy to do a brief phone walkthrough of the report, and many include a legend on the first page explaining their rating system. Your buyer's agent can also help you interpret findings in the context of local norms — what counts as a 'major defect' in a 1960s ranch house differs from the same label on a new build.
@@ -32,6 +36,24 @@ faqs:
     answer: If you miss the contingency window without acting, you typically waive your right to negotiate based on inspection findings and lose your ability to exit the contract without forfeiting your earnest money. Mark the deadline on your calendar the moment your offer is accepted, and confirm the exact expiration date and time in your purchase agreement.
   - question: Is a seller credit better than asking the seller to make the repairs themselves?
     answer: It depends on the item and the seller. A seller credit gives you control over who does the work and to what standard — important for electrical or structural repairs. However, if the lender requires certain repairs to be completed before funding (common for FHA and VA loans), a seller credit alone may not satisfy underwriting. Ask your lender before choosing between the two options.
+internalLinks:
+  - label: "Home Inspection: Your Complete Guide from Hire to Close"
+    url: /articles/home-inspection-guide/
+  - label: "Home Inspection Checklist for Buyers: Room-by-Room Guide"
+    url: /articles/home-inspection-checklist-for-buyers/
+  - label: "Home Inspection Checklist for Sellers: What to Fix First"
+    url: /articles/home-inspection-checklist-for-sellers/
+  - label: "Housing Inspection Checklist: Printable Room-by-Room PDF"
+    url: /articles/housing-inspection-checklist/
+  - label: "New Home Inspection Checklist: Before Closing on New Build"
+    url: /articles/new-home-inspection-checklist/
+externalLinks:
+  - label: HUD — Buying a home
+    url: https://www.hud.gov/buying
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
 ---
 
 # Home Inspection Report: Read It and Know What to Negotiate
@@ -145,3 +167,7 @@ static inspection reports are increasingly being replaced by video walkthrough r
  The broader market context remains a moderate one: 
 real estate trends point to a slower, more balanced pace rather than a crash or a new boom, with mortgage rates hovering near 6.25% and buyers gradually adapting to that reality.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

@@ -18,11 +18,15 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - new home inspection
   - home inspection checklist
   - Home Inspection
+pillarKeyword: Home Inspection
+supportingKeyword: home inspection checklist
+articleType: flex
+targetKeyword: new home inspection
 faqs:
   - question: Do I really need an independent inspector if the city already inspected my new home?
     answer: Yes. Municipal code inspectors verify that construction meets minimum legal standards — they are not advocates for you as a buyer. They often visit the site briefly and may not catch workmanship issues like improperly wired outlets, missing flashing, HVAC systems that were never commissioned, or grading that directs water toward the foundation. An independent inspector works for you, documents defects in writing, and gives you leverage to require corrections before you sign anything.
@@ -32,6 +36,24 @@ faqs:
     answer: "Most new construction builder warranties are tiered: workmanship and materials are typically covered for 1 year, mechanical systems (electrical, plumbing, HVAC) for 2 years, and major structural defects for 10 years. The 1-year workmanship warranty is the broadest in scope but the shortest in duration — making it critical to document any defects before it expires. Items that fall outside the active warranty tier become your out-of-pocket expense."
   - question: What is an 11-month warranty inspection and do I need one?
     answer: An 11-month warranty inspection is a professional home inspection performed around the 11th month of living in a newly built home — just before the builder's 1-year workmanship warranty expires. Industry data suggests 80–90% of new homes reveal at least one warrantable defect at this stage. Scheduling this inspection gives you documented evidence of defects while the builder is still legally obligated to fix them at no cost to you. Skipping it means those repairs become your financial responsibility.
+internalLinks:
+  - label: "Home Inspection: Your Complete Guide from Hire to Close"
+    url: /articles/home-inspection-guide/
+  - label: "Home Inspection Checklist for Buyers: Room-by-Room Guide"
+    url: /articles/home-inspection-checklist-for-buyers/
+  - label: "Home Inspection Checklist for Sellers: What to Fix First"
+    url: /articles/home-inspection-checklist-for-sellers/
+  - label: "Home Inspection Report: Read It and Know What to Negotiate"
+    url: /articles/home-inspection-report/
+  - label: "Housing Inspection Checklist: Printable Room-by-Room PDF"
+    url: /articles/housing-inspection-checklist/
+externalLinks:
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: InterNACHI — Standards of Practice
+    url: https://www.nachi.org/sop.htm
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
 ---
 
 ## Why New Construction Is Not the Same as Defect-Free
@@ -144,3 +166,7 @@ The Congressional Budget Office projects new home construction to reach an annua
 Buyers and lenders are increasingly demanding more detailed due diligence beyond the standard inspection, with bundled inspection protocols — covering foundation, HVAC, roof, and crawl space — now common, as the in-depth approach reduces the risk of major undisclosed defects that could trigger renegotiation post-inspection or post-closing.
  There are no major regulatory changes to new construction inspection requirements in the past 45 days, but the broader trend toward phased, multi-inspection protocols for new builds continues to accelerate with the housing construction boom.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

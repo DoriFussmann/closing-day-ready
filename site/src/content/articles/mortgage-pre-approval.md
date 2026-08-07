@@ -18,9 +18,12 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - mortgage pre-approval
+pillarKeyword: Mortgage Pre-Approval
+articleType: comprehensive
+targetKeyword: mortgage pre-approval
 faqs:
   - question: How long does a mortgage pre-approval take?
     answer: Most lenders can complete a pre-approval in one to three business days once you submit a complete application with all required documents. The process can stretch longer if your financial picture is complex — self-employment, multiple income sources, or gaps in employment history often require additional review. Submitting a fully organized document package upfront is the single most reliable way to keep the timeline short.
@@ -30,6 +33,16 @@ faqs:
     answer: Pre-approval letters typically expire in 60 to 90 days. If yours lapses, the process to renew is usually simpler than the original application — lenders will refresh your credit pull and ask for updated income and asset documents. Whether you need a full re-application or a light update depends on how much time has passed and whether your financial situation has changed. Contact your lender as soon as you see the expiration approaching, not after it has passed.
   - question: Can I be denied a mortgage after getting pre-approved?
     answer: Yes. Pre-approval is conditional on your financial situation staying consistent. A job change, new debt, a large unexplained deposit, or a significant drop in your credit score between pre-approval and closing can all result in a denial at the underwriting stage. This is why lenders and experienced buyers treat financial stability during the house-hunting period as just as important as the pre-approval itself — avoid major financial moves until you have your keys.
+externalLinks:
+  - label: CFPB
+    url: https://www.consumerfinance.gov/owning-a-home/
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: HUD — Buying a home
+    url: https://www.hud.gov/buying
+internalLinks:
+  - label: How Long Does a Mortgage Pre-Approval Last? A Full Guide
+    url: /articles/how-long-does-a-mortgage-pre-approval-last/
 ---
 
 ## What Mortgage Pre-Approval Actually Is — and Why It Matters
@@ -164,3 +177,7 @@ For the week ending July 10, 2026, the Mortgage Bankers Association reported tha
 a May 2026 survey found that nearly two-thirds of homebuyers — 62% — were waiting for mortgage rates to fall before purchasing
 , a strategy that industry data consistently shows has unpredictable results. For buyers who are financially ready, securing a strong pre-approval now and understanding exactly where they stand financially remains the most productive use of that waiting period, regardless of where rates ultimately move.
 <!-- WHERE-THINGS-STAND:END -->
+
+For further reading, see the Sources listed below.
+
+See Related Reads below for more on this topic.

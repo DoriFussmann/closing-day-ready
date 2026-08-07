@@ -1,5 +1,6 @@
 ---
-import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import { getCollection, getEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_NAME } from "../../config/site";
 
@@ -7,10 +8,23 @@ const allArticles = (await getCollection("articles"))
   .filter((a) => !a.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const pageSize = 9;
-const currentPage = 1;
-const totalPages = Math.max(1, Math.ceil(allArticles.length / pageSize));
-const articles = allArticles.slice(0, pageSize);
+const articlesWithAuthors = await Promise.all(
+  allArticles.map(async (article) => {
+    const authorEntry = await getEntry("team", article.data.author);
+    return {
+      article,
+      authorName: authorEntry?.data.name ?? article.data.author,
+    };
+  })
+);
+
+const topics = [
+  ...new Set(
+    allArticles
+      .map((a) => a.data.pillarKeyword)
+      .filter((topic): topic is string => Boolean(topic))
+  ),
+].sort((a, b) => a.localeCompare(b));
 ---
 
 <BaseLayout
@@ -21,69 +35,167 @@ const articles = allArticles.slice(0, pageSize);
   <section aria-labelledby="articles-heading" class="section-space">
     <div class="container-site">
       <h1 id="articles-heading" class="mb-8">Articles</h1>
-      <ul class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+
+      <form
+        id="articles-filters"
+        class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end"
+        role="search"
+      >
+        <div class="min-w-0 flex-1">
+          <label for="articles-search" class="mb-2 block text-small text-muted">
+            Search by title
+          </label>
+          <input
+            id="articles-search"
+            name="q"
+            type="search"
+            autocomplete="off"
+            placeholder="Search articles…"
+            class="min-h-11 w-full rounded-btn border border-border bg-white px-3 text-small text-heading placeholder:text-muted"
+          />
+        </div>
+        <div class="w-full sm:w-64">
+          <label for="articles-topic" class="mb-2 block text-small text-muted">
+            Topic
+          </label>
+          <select
+            id="articles-topic"
+            name="topic"
+            class="min-h-11 w-full rounded-btn border border-border bg-white px-3 text-small text-heading"
+          >
+            <option value="">All topics</option>
+            {
+              topics.map((topic) => (
+                <option value={topic}>{topic}</option>
+              ))
+            }
+          </select>
+        </div>
+      </form>
+
+      <p id="articles-empty" class="mb-0 text-small text-muted" hidden>
+        No articles match your filters.
+      </p>
+
+      <ul
+        id="articles-grid"
+        class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {
-          articles.map((article) => (
-            <li>
+          articlesWithAuthors.map(({ article, authorName }) => (
+            <li
+              data-title={article.data.title.toLowerCase()}
+              data-topic={article.data.pillarKeyword ?? ""}
+            >
               <a
                 href={`/articles/${article.data.slug}/`}
-                class="card group flex h-full flex-col no-underline transition-colors hover:border-accent/40 hover:no-underline"
+                class="card group flex h-full flex-col overflow-hidden p-0 no-underline transition-colors hover:border-accent/40 hover:no-underline"
               >
-                <span class="mb-3 block text-h4 font-light text-heading group-hover:text-accent">
-                  {article.data.title}
-                </span>
-                <p class="m-0 flex-1 text-small text-muted">{article.data.description}</p>
-                <p class="mt-4 mb-0 text-small text-muted">
-                  <time datetime={article.data.date.toISOString()}>
-                    {article.data.date.toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </time>
-                </p>
+                <div class="article-hero-frame">
+                  <Image
+                    src={article.data.image}
+                    alt={article.data.imageAlt}
+                    width={600}
+                    height={315}
+                    loading="lazy"
+                  />
+                </div>
+                <div class="flex flex-1 flex-col p-5">
+                  <span class="mb-3 block text-h4 font-light text-heading group-hover:text-accent">
+                    {article.data.title}
+                  </span>
+                  <p class="mt-auto mb-0 text-small text-muted">
+                    <time datetime={article.data.date.toISOString()}>
+                      {article.data.date.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
+                    <span aria-hidden="true"> · </span>
+                    <span>{authorName}</span>
+                  </p>
+                </div>
               </a>
             </li>
           ))
         }
       </ul>
-      {
-        totalPages > 1 && (
-          <nav aria-label="Pagination" class="mt-10 border-t border-border pt-8">
-            <p class="mb-4 text-small text-muted">
-              Page {currentPage} of {totalPages}
-            </p>
-            <ol class="m-0 flex list-none flex-wrap gap-2 p-0">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-                <li>
-                  {n === currentPage ? (
-                    <span
-                      aria-current="page"
-                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn bg-accent px-3 text-small font-normal text-white"
-                    >
-                      {n}
-                    </span>
-                  ) : n === 1 ? (
-                    <a
-                      href="/articles/"
-                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-border bg-white px-3 text-small text-heading no-underline hover:bg-surface hover:no-underline"
-                    >
-                      {n}
-                    </a>
-                  ) : (
-                    <a
-                      href={`/articles/page/${n}/`}
-                      class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-btn border border-border bg-white px-3 text-small text-heading no-underline hover:bg-surface hover:no-underline"
-                    >
-                      {n}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </nav>
-        )
-      }
     </div>
   </section>
+
+  <script>
+    const form = document.getElementById("articles-filters");
+    const searchInput = document.getElementById("articles-search");
+    const topicSelect = document.getElementById("articles-topic");
+    const emptyMessage = document.getElementById("articles-empty");
+    const grid = document.getElementById("articles-grid");
+
+    if (
+      form instanceof HTMLFormElement &&
+      searchInput instanceof HTMLInputElement &&
+      topicSelect instanceof HTMLSelectElement &&
+      emptyMessage instanceof HTMLElement &&
+      grid instanceof HTMLElement
+    ) {
+      const items = [...grid.querySelectorAll<HTMLElement>(":scope > li")];
+
+      const applyFilters = () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const topic = topicSelect.value;
+        let visibleCount = 0;
+
+        for (const item of items) {
+          const title = item.dataset.title ?? "";
+          const itemTopic = item.dataset.topic ?? "";
+          const matchesSearch = !query || title.includes(query);
+          const matchesTopic = !topic || itemTopic === topic;
+          const show = matchesSearch && matchesTopic;
+          item.hidden = !show;
+          if (show) visibleCount += 1;
+        }
+
+        emptyMessage.hidden = visibleCount > 0;
+      };
+
+      const syncFromParams = () => {
+        const params = new URLSearchParams(window.location.search);
+        searchInput.value = params.get("q") ?? "";
+        const topic = params.get("topic") ?? "";
+        topicSelect.value = [...topicSelect.options].some((o) => o.value === topic)
+          ? topic
+          : "";
+        applyFilters();
+      };
+
+      const writeParams = () => {
+        const params = new URLSearchParams();
+        const query = searchInput.value.trim();
+        const topic = topicSelect.value;
+        if (query) params.set("q", query);
+        if (topic) params.set("topic", topic);
+        const next = params.toString();
+        const url = next
+          ? `${window.location.pathname}?${next}`
+          : window.location.pathname;
+        window.history.replaceState({}, "", url);
+      };
+
+      searchInput.addEventListener("input", () => {
+        writeParams();
+        applyFilters();
+      });
+      topicSelect.addEventListener("change", () => {
+        writeParams();
+        applyFilters();
+      });
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        writeParams();
+        applyFilters();
+      });
+
+      syncFromParams();
+    }
+  </script>
 </BaseLayout>

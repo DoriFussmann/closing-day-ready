@@ -1,0 +1,50 @@
+---
+---
+
+<button
+  type="button"
+  id="back-to-top"
+  class="pointer-events-none fixed bottom-6 right-6 z-50 inline-flex min-h-11 min-w-11 translate-y-2 items-center justify-center rounded-btn border border-border bg-white text-heading opacity-0 shadow-card transition-[opacity,transform] duration-200 hover:bg-surface focus-visible:opacity-100"
+  aria-label="Back to top"
+  hidden
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 19V5"></path>
+    <path d="m5 12 7-7 7 7"></path>
+  </svg>
+</button>
+
+<script>
+  const button = document.getElementById("back-to-top");
+  if (button instanceof HTMLButtonElement) {
+    const threshold = 400;
+
+    const updateVisibility = () => {
+      const show = window.scrollY > threshold;
+      button.hidden = !show;
+      button.classList.toggle("pointer-events-none", !show);
+      button.classList.toggle("opacity-0", !show);
+      button.classList.toggle("translate-y-2", !show);
+      button.classList.toggle("opacity-100", show);
+      button.classList.toggle("translate-y-0", show);
+    };
+
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    updateVisibility();
+  }
+</script>

@@ -8,6 +8,8 @@ import AuthorBio from "../components/AuthorBio.astro";
 import RelatedLinks from "../components/RelatedLinks.astro";
 import Sources from "../components/Sources.astro";
 import FaqBlock from "../components/FaqBlock.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import BackToTop from "../components/BackToTop.astro";
 import { SITE_NAME, SITE_URL } from "../config/site";
 import { absoluteUrl } from "../lib/url";
 
@@ -25,7 +27,7 @@ if (!authorEntry) {
   );
 }
 
-const { Content } = await render(article);
+const { Content, headings } = await render(article);
 const pageH1 = data.h1 || data.title;
 const updatedDate = data.updatedDate || data.date;
 const ogTitle = data.ogTitle || data.title;
@@ -143,7 +145,7 @@ const updatedLabel = updatedDate.toLocaleDateString("en-US", {
   twitterCard={data.twitterCard}
   jsonLd={jsonLd}
 >
-  <article class="container-site section-space mx-auto max-w-article">
+  <article class="container-site section-space">
     <Breadcrumbs items={breadcrumbItems} />
     <header class="mb-10">
       <h1 class="mb-4">{pageH1}</h1>
@@ -158,15 +160,18 @@ const updatedLabel = updatedDate.toLocaleDateString("en-US", {
           ))
         }
       </p>
-      <Image
-        src={data.image}
-        alt={data.imageAlt}
-        width={1200}
-        height={630}
-        loading="eager"
-        class="h-auto w-full rounded-card border border-border"
-      />
+      <div class="article-hero-frame rounded-card border border-border">
+        <Image
+          src={data.image}
+          alt={data.imageAlt}
+          width={1200}
+          height={630}
+          loading="eager"
+        />
+      </div>
     </header>
+
+    <TableOfContents headings={headings} />
 
     <div class="prose-article">
       <Content />
@@ -210,4 +215,5 @@ const updatedLabel = updatedDate.toLocaleDateString("en-US", {
     )}
     {data.faqs && data.faqs.length > 0 && <FaqBlock faqs={data.faqs} />}
   </article>
+  <BackToTop />
 </BaseLayout>

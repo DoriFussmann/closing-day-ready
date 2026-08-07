@@ -79,6 +79,7 @@
   .prose-article {
     @apply prose prose-lg max-w-none font-light text-body
       prose-headings:font-light prose-headings:text-heading
+      prose-headings:scroll-mt-24
       prose-h2:text-h2 prose-h3:text-h3 prose-h4:text-h4
       prose-p:text-content prose-p:leading-[1.7] prose-p:text-body
       prose-a:font-normal prose-a:text-accent prose-a:no-underline hover:prose-a:underline
@@ -92,6 +93,15 @@
 
   .section-space {
     @apply py-12 md:py-16;
+  }
+
+  /* Fixed landscape crop for article heroes (listing tiles + detail). */
+  .article-hero-frame {
+    @apply relative aspect-[16/9] w-full overflow-hidden;
+  }
+
+  .article-hero-frame > img {
+    @apply absolute inset-0 h-full w-full object-cover object-center;
   }
 
   .tap-target {

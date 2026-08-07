@@ -63,6 +63,10 @@ export function buildFrontmatterForWrite(
   fm.updatedDate = toIsoDate(updated);
 
   if (data.keywords?.length) fm.keywords = data.keywords;
+  if (data.pillarKeyword) fm.pillarKeyword = data.pillarKeyword;
+  if (data.supportingKeyword) fm.supportingKeyword = data.supportingKeyword;
+  if (data.articleType) fm.articleType = data.articleType;
+  if (data.targetKeyword) fm.targetKeyword = data.targetKeyword;
   if (data.canonical) fm.canonical = data.canonical;
 
   if (imagePaths.image2) {
@@ -201,6 +205,42 @@ export function setArticleDraft(slug: string, draft: boolean): void {
   const content = `---\n${yaml}\n---\n\n${existing.body}\n`;
   fs.writeFileSync(path.join(ARTICLES_DIR, `${slug}.md`), content, "utf8");
   generateLlmsTxt();
+}
+
+/**
+ * Patch frontmatter and/or body in place (preserves unrelated fields).
+ * Used by Articles Health Propose/Connect — not the full generate pipeline.
+ */
+export function patchArticleContent(
+  slug: string,
+  options: {
+    frontmatterPatch?: Record<string, unknown>;
+    body?: string;
+    bumpUpdatedDate?: boolean;
+  }
+): { slug: string; updatedDate?: string } {
+  const existing = readArticleFile(slug);
+  if (!existing) throw new Error(`Article not found: ${slug}`);
+
+  const fm: Record<string, unknown> = {
+    ...existing.frontmatter,
+    ...(options.frontmatterPatch || {}),
+  };
+
+  if (options.bumpUpdatedDate !== false) {
+    fm.updatedDate = new Date().toISOString().slice(0, 10);
+  }
+
+  const body = options.body !== undefined ? options.body : existing.body;
+  const yaml = YAML.stringify(fm, { lineWidth: 0 }).trimEnd();
+  const content = `---\n${yaml}\n---\n\n${body.trim()}\n`;
+  fs.writeFileSync(path.join(ARTICLES_DIR, `${slug}.md`), content, "utf8");
+  generateLlmsTxt();
+
+  return {
+    slug,
+    updatedDate: fm.updatedDate ? String(fm.updatedDate) : undefined,
+  };
 }
 
 export function deleteArticle(slug: string): void {

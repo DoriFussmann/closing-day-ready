@@ -18,10 +18,14 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - how long does a mortgage pre-approval last
   - Mortgage Pre-Approval
+pillarKeyword: Mortgage Pre-Approval
+supportingKeyword: how long does a mortgage pre-approval last
+articleType: comprehensive
+targetKeyword: how long does a mortgage pre-approval last
 faqs:
   - question: Can a pre-approval expire while I'm already under contract?
     answer: Yes, it can — but it's usually a non-event. Once you're under contract, your lender continues building the loan file through underwriting and closing. If the credit report used for your pre-approval is nearing its 120-day limit, your loan officer will simply pull a refreshed report as part of the standard closing checklist. You typically won't need to resubmit a full application; just provide updated pay stubs and bank statements when your lender asks.
@@ -31,6 +35,22 @@ faqs:
     answer: "Minimally, if you do it within a concentrated window. Credit scoring models recognize mortgage rate shopping and typically treat multiple mortgage inquiries made within 14 to 45 days as a single inquiry. The practical advice: if you want to compare offers from two or three lenders, submit those applications close together rather than spread across months."
   - question: Is a pre-approval the same as a final loan approval?
     answer: No. A pre-approval is a conditional commitment based on a snapshot of your finances at the time you applied. Final loan approval — also called clear to close — comes only after the lender has verified the specific property through an appraisal, completed full underwriting, and confirmed that nothing in your financial picture has changed since pre-approval. Keeping your finances stable between pre-approval and closing is critical to ensuring the conditional commitment becomes a real one.
+internalLinks:
+  - label: "Mortgage Pre-Approval: The Complete Guide for Homebuyers"
+    url: /articles/mortgage-pre-approval/
+  - label: "Stronger Mortgage Pre-Approval: 7 Moves Before Your Offer"
+    url: /articles/better-mortgage-pre-approval/
+  - label: How Long Does Mortgage Pre-Approval Take? Your Timeline
+    url: /articles/how-long-does-mortgage-pre-approval-take/
+  - label: Mortgage Pre-Approval Expired? A Step-by-Step Renewal Plan
+    url: /articles/mortgage-pre-approval-expired-how-to-renew/
+externalLinks:
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
+  - label: ASHI — Standards of Practice
+    url: https://www.homeinspector.org/Resources/StandardsofPractice
 ---
 
 ## What a Pre-Approval Letter Actually Represents
@@ -200,3 +220,7 @@ For the first time in four years, home sales increased during the spring season,
 Homes sold faster than they did a year ago for the second time in four weeks, and active inventory held above 1.1 million properties for the sixth consecutive week
 , suggesting that buyers who arrive at the table with stale or expired letters face real risk of losing homes in a market that is moving more quickly than it did a year ago.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

@@ -33,6 +33,12 @@ export const articleFrontmatterSchema = z.object({
   h1: z.string().min(20).optional(),
   updatedDate: z.coerce.date().optional(),
   keywords: z.array(z.string()).optional(),
+  pillarKeyword: z.string().optional(),
+  supportingKeyword: z.string().optional(),
+  articleType: z
+    .enum(["comprehensive", "howto", "comparison", "faq", "flex"])
+    .optional(),
+  targetKeyword: z.string().optional(),
   canonical: z.string().optional(),
   image2: z.string().optional(),
   image2Alt: z.string().min(10).optional(),

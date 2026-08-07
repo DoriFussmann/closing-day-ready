@@ -13,11 +13,20 @@ import {
 import {
   deleteArticle,
   listArticles,
+  patchArticleContent,
   readArticleFile,
   setArticleDraft,
   writeArticle,
   type StagedImage,
 } from "./lib/writeArticle.js";
+import {
+  absoluteArticleUrl,
+  buildArticlesHealthReport,
+  ensureSignpost,
+  EXTERNAL_SIGNPOST,
+  INTERNAL_SIGNPOST,
+  proposeExternalLinks,
+} from "./lib/articlesHealth.js";
 import {
   deleteTeamMember,
   knownAuthorSlugs,
@@ -345,6 +354,106 @@ app.delete(
   asyncHandler(async (req, res) => {
     deleteArticle(req.params.slug);
     res.json({ ok: true });
+  })
+);
+
+app.get(
+  "/api/articles-health",
+  asyncHandler(async (_req, res) => {
+    res.json({ ok: true, ...buildArticlesHealthReport() });
+  })
+);
+
+app.get(
+  "/api/articles/:slug/propose-external",
+  asyncHandler(async (req, res) => {
+    try {
+      const result = proposeExternalLinks(req.params.slug);
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      return jsonError(
+        res,
+        404,
+        err instanceof Error ? err.message : "Propose failed"
+      );
+    }
+  })
+);
+
+app.post(
+  "/api/articles/:slug/links/external",
+  asyncHandler(async (req, res) => {
+    const label = String(req.body?.label || "").trim();
+    const url = String(req.body?.url || "").trim();
+    if (!label || !url) {
+      return jsonError(res, 400, "label and url are required");
+    }
+    const existing = readArticleFile(req.params.slug);
+    if (!existing) return jsonError(res, 404, "Article not found");
+
+    const links = Array.isArray(existing.frontmatter.externalLinks)
+      ? [...(existing.frontmatter.externalLinks as Array<{ label: string; url: string }>)]
+      : [];
+    if (links.some((l) => l.url.replace(/\/+$/, "") === url.replace(/\/+$/, ""))) {
+      return jsonError(res, 400, "External link already present");
+    }
+    links.push({ label, url });
+
+    const body = ensureSignpost(existing.body, EXTERNAL_SIGNPOST);
+    const result = patchArticleContent(req.params.slug, {
+      frontmatterPatch: { externalLinks: links },
+      body,
+      bumpUpdatedDate: true,
+    });
+    res.json({ ok: true, ...result, externalLinks: links });
+  })
+);
+
+app.post(
+  "/api/articles/:slug/links/internal",
+  asyncHandler(async (req, res) => {
+    const targetSlug = String(req.body?.targetSlug || "").trim();
+    if (!targetSlug) return jsonError(res, 400, "targetSlug is required");
+
+    const existing = readArticleFile(req.params.slug);
+    if (!existing) return jsonError(res, 404, "Article not found");
+    const target = readArticleFile(targetSlug);
+    if (!target) return jsonError(res, 404, "Target article not found");
+    if (target.frontmatter.draft) {
+      return jsonError(res, 400, "Cannot link to a draft article");
+    }
+
+    const label = String(
+      req.body?.label || target.frontmatter.title || targetSlug
+    ).trim();
+    const pathUrl = `/articles/${targetSlug}/`;
+
+    const links = Array.isArray(existing.frontmatter.internalLinks)
+      ? [...(existing.frontmatter.internalLinks as Array<{ label: string; url: string }>)]
+      : [];
+    const norm = (u: string) => u.replace(/\/+$/, "");
+    if (links.some((l) => norm(l.url) === norm(pathUrl))) {
+      return jsonError(res, 400, "Internal link already present");
+    }
+    links.push({ label, url: pathUrl });
+
+    const body = ensureSignpost(existing.body, INTERNAL_SIGNPOST);
+    const result = patchArticleContent(req.params.slug, {
+      frontmatterPatch: { internalLinks: links },
+      body,
+      bumpUpdatedDate: true,
+    });
+    res.json({
+      ok: true,
+      ...result,
+      internalLinks: links,
+      connected: {
+        slug: targetSlug,
+        label,
+        url: pathUrl,
+        href: absoluteArticleUrl(targetSlug),
+      },
+    });
   })
 );
 

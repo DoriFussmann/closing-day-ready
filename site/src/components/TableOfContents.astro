@@ -1,0 +1,39 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  tocItems.length > 0 && (
+    <nav
+      aria-labelledby="toc-heading"
+      class="mb-10 rounded-card border border-border bg-surface p-5 md:p-6"
+    >
+      <h2 id="toc-heading" class="mb-4 text-h4">
+        Table of contents
+      </h2>
+      <ol class="m-0 list-none space-y-2 p-0">
+        {tocItems.map((item) => (
+          <li class:list={[item.depth === 3 && "pl-4"]}>
+            <a
+              href={`#${item.slug}`}
+              class="text-small text-heading no-underline hover:text-accent hover:underline"
+            >
+              {item.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}

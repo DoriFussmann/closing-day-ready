@@ -18,11 +18,15 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - home inspection checklist for sellers
   - home inspection checklist
   - Home Inspection
+pillarKeyword: Home Inspection
+supportingKeyword: home inspection checklist
+articleType: flex
+targetKeyword: home inspection checklist for sellers
 faqs:
   - question: Should I fix everything before a home inspection or just the obvious items?
     answer: "Focus first on low-cost, high-visibility issues — burnt-out bulbs, running toilets, missing outlet covers, clogged gutters — because inspectors flag these regardless of how minor they are, and they can make a home feel poorly maintained. For larger issues, use a fix-vs.-disclose-vs.-credit framework: safety items and anything that could affect financing approval should be repaired; cosmetic upgrades or big-ticket items buyers may prefer to customize can often be offered as a closing credit instead."
@@ -32,6 +36,24 @@ faqs:
     answer: Inspectors consistently devote the most attention to the roof, HVAC system, electrical panel, plumbing, and any signs of water intrusion. Roofing issues appear in roughly one in five inspection reports, electrical problems in nearly as many, and water or drainage concerns in nearly half of all inspections. Ensuring these systems are accessible, recently serviced, and have documentation is the highest-ROI prep a seller can do.
   - question: What documents should I have ready on inspection day?
     answer: Gather any service records for the HVAC system (especially recent filter changes and annual tune-ups), receipts for roof work or repairs, appliance manuals and age documentation, permits for renovations, and any transferable warranties. Leaving these in a visible folder — sometimes called a 'home history packet' — on the kitchen counter signals transparency to both the inspector and the buyer, often reducing follow-up questions and repair demands.
+internalLinks:
+  - label: "Home Inspection: Your Complete Guide from Hire to Close"
+    url: /articles/home-inspection-guide/
+  - label: "Home Inspection Checklist for Buyers: Room-by-Room Guide"
+    url: /articles/home-inspection-checklist-for-buyers/
+  - label: "Home Inspection Report: Read It and Know What to Negotiate"
+    url: /articles/home-inspection-report/
+  - label: "Housing Inspection Checklist: Printable Room-by-Room PDF"
+    url: /articles/housing-inspection-checklist/
+  - label: "New Home Inspection Checklist: Before Closing on New Build"
+    url: /articles/new-home-inspection-checklist/
+externalLinks:
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
+  - label: InterNACHI — Standards of Practice
+    url: https://www.nachi.org/sop.htm
+  - label: HUD — Buying a home
+    url: https://www.hud.gov/buying
 ---
 
 # Home Inspection Checklist for Sellers: What to Fix First
@@ -172,3 +194,7 @@ thermal imaging was once a luxury add-on, but it is now becoming baseline — in
 The global residential home inspections market was valued at approximately $1.7 billion in 2026 and is projected to reach $3.73 billion by 2035
 , reflecting sustained structural growth in buyer due-diligence demand that is unlikely to reverse regardless of how real estate cycles move.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

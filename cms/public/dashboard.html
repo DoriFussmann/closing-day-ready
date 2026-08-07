@@ -24,35 +24,47 @@
       </div>
     </header>
 
-    <div class="page-hero">
-      <div class="container">
-        <h1>Dashboard</h1>
-        <p>Review article health across drafts, links, FAQs, and update dates.</p>
+    <div class="cms-shell">
+      <aside class="cms-sidebar" aria-label="Articles navigation">
+        <ul class="sidebar-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="/add-article.html">Add Article</a></li>
+          <li><a href="/articles-health.html">Articles Health</a></li>
+        </ul>
+      </aside>
+
+      <div class="cms-main">
+        <div class="page-hero">
+          <div class="container">
+            <h1>Dashboard</h1>
+            <p>Review article health across drafts, links, FAQs, and update dates.</p>
+          </div>
+        </div>
+
+        <main class="container">
+          <section class="panel" aria-labelledby="health-heading">
+            <h2 id="health-heading">Article health</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>title</th>
+                    <th>slug</th>
+                    <th>draft</th>
+                    <th>internalLinks</th>
+                    <th>externalLinks</th>
+                    <th>faqs</th>
+                    <th>updatedDate</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-body"></tbody>
+              </table>
+            </div>
+            <pre id="dashboard-status" aria-live="polite"></pre>
+          </section>
+        </main>
       </div>
     </div>
-
-    <main class="container">
-      <section class="panel" aria-labelledby="health-heading">
-        <h2 id="health-heading">Article health</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>title</th>
-                <th>slug</th>
-                <th>draft</th>
-                <th>internalLinks</th>
-                <th>externalLinks</th>
-                <th>faqs</th>
-                <th>updatedDate</th>
-              </tr>
-            </thead>
-            <tbody id="dashboard-body"></tbody>
-          </table>
-        </div>
-        <pre id="dashboard-status" aria-live="polite"></pre>
-      </section>
-    </main>
     <script src="/app.js"></script>
   </body>
 </html>

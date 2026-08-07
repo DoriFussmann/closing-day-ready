@@ -18,11 +18,15 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - home inspection checklist for buyers
   - home inspection checklist
   - Home Inspection
+pillarKeyword: Home Inspection
+supportingKeyword: home inspection checklist
+articleType: comprehensive
+targetKeyword: home inspection checklist for buyers
 faqs:
   - question: How long does a home inspection take?
     answer: Most standard home inspections take two to four hours, depending on the size and age of the property. Larger homes, older construction, or houses with detached structures like garages and guest houses will take longer. Plan to attend at least the final 30–60 minutes so the inspector can walk you through findings in person — that verbal context almost never makes it into the written report.
@@ -32,6 +36,24 @@ faqs:
     answer: A serious finding does not automatically kill a deal — it gives you options. Within your inspection contingency window (typically 5–10 days), you can request that the seller make specific repairs before closing, ask for a price reduction or closing-cost credit in lieu of repairs, or walk away entirely with your earnest money refunded. The right move depends on the severity of the issue, the cost to fix it, and how much you want the home. Your real estate agent and, if needed, a specialist contractor can help you put a dollar figure on any major findings before you decide.
   - question: What does a standard home inspection NOT cover?
     answer: A standard inspection is a non-invasive visual assessment — the inspector cannot open walls, move furniture, or test for substances. It typically does not include radon testing, sewer line scoping, mold or air-quality sampling, pest or termite inspection, oil tank sweeps, pool and spa systems, or full roof inspections requiring drone or infrared equipment (though many inspectors offer these as add-ons). If the home is older, in a flood-prone area, or has a private well or septic system, ordering the relevant specialty tests is strongly advisable.
+internalLinks:
+  - label: "Home Inspection: Your Complete Guide from Hire to Close"
+    url: /articles/home-inspection-guide/
+  - label: "Home Inspection Checklist for Sellers: What to Fix First"
+    url: /articles/home-inspection-checklist-for-sellers/
+  - label: "Home Inspection Report: Read It and Know What to Negotiate"
+    url: /articles/home-inspection-report/
+  - label: "Housing Inspection Checklist: Printable Room-by-Room PDF"
+    url: /articles/housing-inspection-checklist/
+  - label: "New Home Inspection Checklist: Before Closing on New Build"
+    url: /articles/new-home-inspection-checklist/
+externalLinks:
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: ASHI — Standards of Practice
+    url: https://www.homeinspector.org/Resources/StandardsofPractice
 ---
 
 ## What a Home Inspection Actually Is — and Isn't
@@ -182,3 +204,7 @@ As competition among buyers cools compared to peak years, fewer buyers are willi
 ---
 
 Once you've worked through the inspection, absorbed the report, and used your contingency window to negotiate from a position of knowledge, the next critical step is making sure your financing is as solid as the house you just inspected. Interest rates, loan structure, and lender selection can collectively affect the total cost of your mortgage by tens of thousands of dollars over the life of the loan — and the period between inspection and closing is the right time to pressure-test those details. Closing Day Ready connects buyers with vetted mortgage professionals who can walk you through your loan options with the same clarity and directness you just brought to your inspection. The goal is the same: arrive at closing day with no surprises.
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.

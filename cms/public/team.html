@@ -24,67 +24,79 @@
       </div>
     </header>
 
-    <div class="page-hero">
-      <div class="container">
-        <h1>New / Edit Team Member</h1>
-        <p>Manage author bios, credentials, and profile photos.</p>
+    <div class="cms-shell">
+      <aside class="cms-sidebar" aria-label="Articles navigation">
+        <ul class="sidebar-nav">
+          <li><a href="/">Articles</a></li>
+          <li><a href="/add-article.html">Add Article</a></li>
+          <li><a href="/articles-health.html">Articles Health</a></li>
+        </ul>
+      </aside>
+
+      <div class="cms-main">
+        <div class="page-hero">
+          <div class="container">
+            <h1>New / Edit Team Member</h1>
+            <p>Manage author bios, credentials, and profile photos.</p>
+          </div>
+        </div>
+
+        <main class="container">
+          <section class="panel" aria-labelledby="team-list-heading">
+            <h2 id="team-list-heading">Existing team</h2>
+            <ul id="team-list" class="item-list"></ul>
+          </section>
+
+          <section class="panel" aria-labelledby="team-form-heading">
+            <h2 id="team-form-heading">Team member form</h2>
+            <form id="team-form">
+              <fieldset>
+                <legend>Profile</legend>
+                <p class="field">
+                  <label>name</label>
+                  <input name="name" required />
+                </p>
+                <p class="field">
+                  <label>slug</label>
+                  <input name="slug" required />
+                </p>
+                <p class="field">
+                  <label>role</label>
+                  <input name="role" required />
+                </p>
+                <p class="field">
+                  <label>bio</label>
+                  <textarea name="bio" rows="5" required></textarea>
+                </p>
+                <p class="field">
+                  <label>credentials (optional)</label>
+                  <input name="credentials" />
+                </p>
+                <p class="field">
+                  <label>photo (required for new; max 10MB)</label>
+                  <input name="photo" type="file" accept="image/*" />
+                </p>
+                <p class="field">
+                  <label>sameAs (one URL per line)</label>
+                  <textarea name="sameAs" rows="3"></textarea>
+                </p>
+                <p class="field">
+                  <label>
+                    <input type="checkbox" id="team-overwrite" />
+                    Overwrite existing slug
+                  </label>
+                </p>
+              </fieldset>
+              <p class="actions">
+                <button type="submit" class="btn-primary">Save team member</button>
+                <button type="button" id="team-reset" class="btn-secondary">Reset form</button>
+              </p>
+              <pre id="team-status" aria-live="polite"></pre>
+            </form>
+          </section>
+        </main>
       </div>
     </div>
-
-    <main class="container">
-      <section class="panel" aria-labelledby="team-list-heading">
-        <h2 id="team-list-heading">Existing team</h2>
-        <ul id="team-list" class="item-list"></ul>
-      </section>
-
-      <section class="panel" aria-labelledby="team-form-heading">
-        <h2 id="team-form-heading">Team member form</h2>
-        <form id="team-form">
-          <fieldset>
-            <legend>Profile</legend>
-            <p class="field">
-              <label>name</label>
-              <input name="name" required />
-            </p>
-            <p class="field">
-              <label>slug</label>
-              <input name="slug" required />
-            </p>
-            <p class="field">
-              <label>role</label>
-              <input name="role" required />
-            </p>
-            <p class="field">
-              <label>bio</label>
-              <textarea name="bio" rows="5" required></textarea>
-            </p>
-            <p class="field">
-              <label>credentials (optional)</label>
-              <input name="credentials" />
-            </p>
-            <p class="field">
-              <label>photo (required for new; max 10MB)</label>
-              <input name="photo" type="file" accept="image/*" />
-            </p>
-            <p class="field">
-              <label>sameAs (one URL per line)</label>
-              <textarea name="sameAs" rows="3"></textarea>
-            </p>
-            <p class="field">
-              <label>
-                <input type="checkbox" id="team-overwrite" />
-                Overwrite existing slug
-              </label>
-            </p>
-          </fieldset>
-          <p class="actions">
-            <button type="submit" class="btn-primary">Save team member</button>
-            <button type="button" id="team-reset" class="btn-secondary">Reset form</button>
-          </p>
-          <pre id="team-status" aria-live="polite"></pre>
-        </form>
-      </section>
-    </main>
     <script src="/app.js"></script>
   </body>
 </html>

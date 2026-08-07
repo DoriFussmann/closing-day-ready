@@ -18,11 +18,15 @@ schemaType: BlogPosting
 locale: en-US
 twitterCard: summary_large_image
 draft: false
-updatedDate: 2026-08-05
+updatedDate: 2026-08-07
 keywords:
   - housing inspection checklist
   - home inspection checklist
   - Home Inspection
+pillarKeyword: Home Inspection
+supportingKeyword: home inspection checklist
+articleType: flex
+targetKeyword: housing inspection checklist
 faqs:
   - question: Can I use this checklist before I even schedule a professional inspection?
     answer: Yes — and you should. Walking through a home during a showing with this checklist in hand lets you flag visible concerns early, ask the seller's agent pointed questions, and decide whether a property is worth the cost of a full professional inspection. Think of it as a pre-offer filter, not a replacement for the real thing.
@@ -32,6 +36,24 @@ faqs:
     answer: You should absolutely attend and follow along. The written report documents findings, but the inspector's verbal commentary — the 'this is minor but watch it' observations — often doesn't make it into the final document. Bring this checklist and a notes page so you can capture both the formal findings and the off-the-cuff remarks that help you prioritize repairs.
   - question: Do home inspection findings affect my mortgage approval?
     answer: They can. Lenders require the home to meet certain minimum property condition standards, and if the inspection uncovers significant structural, safety, or habitability issues, the appraiser may flag them — which can delay or complicate loan approval. Issues like a failing roof, active water intrusion, or faulty electrical panels are the types that tend to show up in underwriting conversations.
+internalLinks:
+  - label: "Home Inspection: Your Complete Guide from Hire to Close"
+    url: /articles/home-inspection-guide/
+  - label: "Home Inspection Checklist for Buyers: Room-by-Room Guide"
+    url: /articles/home-inspection-checklist-for-buyers/
+  - label: "Home Inspection Checklist for Sellers: What to Fix First"
+    url: /articles/home-inspection-checklist-for-sellers/
+  - label: "Home Inspection Report: Read It and Know What to Negotiate"
+    url: /articles/home-inspection-report/
+  - label: "New Home Inspection Checklist: Before Closing on New Build"
+    url: /articles/new-home-inspection-checklist/
+externalLinks:
+  - label: HUD — Buying a home
+    url: https://www.hud.gov/buying
+  - label: CFPB — What is a mortgage pre-approval?
+    url: https://www.consumerfinance.gov/ask-cfpb/what-is-a-mortgage-pre-approval-en-118/
+  - label: Consumer Financial Protection Bureau — Getting a mortgage
+    url: https://www.consumerfinance.gov/owning-a-home/
 ---
 
 # Housing Inspection Checklist: Printable Room-by-Room PDF
@@ -207,3 +229,7 @@ thermal imaging — once considered a luxury add-on — is becoming a baseline s
 Most 2026 housing forecasts point to a modest rebound in home sales, and as competition among buyers cools compared to peak years, fewer buyers are willing to waive inspections, making them a standard and expected part of the transaction again.
  For buyers preparing for inspection day, the practical implication is straightforward: inspections are both more thorough and more consequential than they were just a few years ago, making preparation and active participation on inspection day more valuable than ever.
 <!-- WHERE-THINGS-STAND:END -->
+
+See Related Reads below for more on this topic.
+
+For further reading, see the Sources listed below.
